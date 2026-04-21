@@ -16,7 +16,6 @@ let adoptionPets = [];
 let featuredPets = [];
 
 let currentView = "home";
-
 let cart = [];
 let refreshInterval = null;
 const AUTO_REFRESH_SECONDS = 60;
@@ -30,15 +29,21 @@ let visibleCounts = {
   adoption: 8,
 };
 
-// Active filtered lists (for load more + sorting + searching)
+// Active lists used for rendering current filters/search
 let activeLists = {
   home: [],
   sale: [],
   adoption: [],
 };
 
+// Remember selected category per page
+let selectedCategory = {
+  sale: "all",
+  adoption: "all",
+};
+
 // ==============================
-// UI HELPERS
+// HELPERS
 // ==============================
 function toggleMenu() {
   document.getElementById("navMenu")?.classList.toggle("active");
@@ -53,6 +58,10 @@ window.onscroll = function () {
     btn.classList.remove("visible");
   }
 };
+
+function normalize(value = "") {
+  return String(value).toLowerCase().trim();
+}
 
 function parsePriceToNumber(priceValue) {
   if (priceValue === null || priceValue === undefined) return Number.MAX_SAFE_INTEGER;
@@ -69,10 +78,6 @@ function isVideoFile(url = "") {
   return u.includes(".mp4") || u.includes(".webm") || u.includes(".mov");
 }
 
-function normalizeSection(value = "") {
-  return String(value).toLowerCase().trim();
-}
-
 // ==============================
 // DATA FETCH
 // ==============================
@@ -85,30 +90,83 @@ async function fetchPetData() {
 
     if (error) throw error;
 
+    // Only show available/reserved on storefront
     const visible = (data || []).filter((p) => {
-      const st = (p.status || "").toLowerCase();
-      // hide sold/hidden
-      return st !== "sold" && st !== "hidden";
+      const st = normalize(p.status);
+      return st === "available" || st === "reserved";
     });
 
     allPets = visible;
-    salePets = visible.filter((p) => normalizeSection(p.section) !== "adoption");
-    adoptionPets = visible.filter((p) => normalizeSection(p.section) === "adoption");
 
-    // featured logic: is_featured true OR top 4 newest
+    // STRICT section mapping
+    salePets = visible.filter((p) => normalize(p.section) === "sale");
+    adoptionPets = visible.filter((p) => normalize(p.section) === "adoption");
+
+    // Featured pets (explicit first, else top newest 4)
     const explicitFeatured = visible.filter((p) => p.is_featured === true);
-    featuredPets = explicitFeatured.length > 0 ? explicitFeatured.slice(0, 4) : visible.slice(0, 4);
+    featuredPets = explicitFeatured.length ? explicitFeatured.slice(0, 4) : visible.slice(0, 4);
 
-    // initialize active lists
-    activeLists.home = [...allPets];
-    activeLists.sale = [...salePets];
-    activeLists.adoption = [...adoptionPets];
+    // Build active lists using current filter/search/sort state
+    rebuildActiveLists();
 
     return true;
   } catch (err) {
     console.error("Supabase fetch error:", err);
     return false;
   }
+}
+
+// ==============================
+// LIST BUILD LOGIC
+// ==============================
+function getSearchText() {
+  return normalize(document.getElementById("globalSearch")?.value || "");
+}
+
+function applyCategoryFilter(baseList, category) {
+  if (category === "all") return [...baseList];
+  return baseList.filter((pet) => normalize(pet.category).includes(category));
+}
+
+function applySearchFilter(list, searchText) {
+  if (!searchText) return [...list];
+  return list.filter((pet) => {
+    return normalize(pet.name).includes(searchText) || normalize(pet.category).includes(searchText);
+  });
+}
+
+function sortListByType(list, sortType) {
+  const arr = [...list];
+  if (sortType === "priceLow") {
+    arr.sort((a, b) => parsePriceToNumber(a.price) - parsePriceToNumber(b.price));
+  } else {
+    // newest
+    arr.sort((a, b) => {
+      const da = new Date(a.created_at || 0).getTime();
+      const db = new Date(b.created_at || 0).getTime();
+      return db - da;
+    });
+  }
+  return arr;
+}
+
+function rebuildActiveLists() {
+  const searchText = getSearchText();
+
+  // Home: search only
+  activeLists.home = applySearchFilter(allPets, searchText);
+
+  // Sale
+  const saleCategoryFiltered = applyCategoryFilter(salePets, selectedCategory.sale);
+  const saleSearched = applySearchFilter(saleCategoryFiltered, searchText);
+  const saleSort = document.getElementById("sale-sort")?.value || "newest";
+  activeLists.sale = sortListByType(saleSearched, saleSort);
+
+  // Adoption
+  const adoptionCategoryFiltered = applyCategoryFilter(adoptionPets, selectedCategory.adoption);
+  const adoptionSearched = applySearchFilter(adoptionCategoryFiltered, searchText);
+  const adoptionSort = document.getElementById("adoption-sort")?.value || "newest";
+  activeLists.adoption = sortListByType(adoptionSearched, adoptionSort);
 }
 
 // ==============================
@@ -124,8 +182,8 @@ function renderGrid(petsToDisplay, containerId, emptyStateId, mode = "normal") {
   if (!petsToDisplay || petsToDisplay.length === 0) {
     if (emptyState) emptyState.style.display = "block";
     return;
-  } else {
-    if (emptyState) emptyState.style.display = "none";
+  } else if (emptyState) {
+    emptyState.style.display = "none";
   }
 
   petsToDisplay.forEach((pet) => {
@@ -137,12 +195,14 @@ function renderGrid(petsToDisplay, containerId, emptyStateId, mode = "normal") {
     const media = pet.media_url || "https://placehold.co/400x300?text=No+Image";
     const isVideo = isVideoFile(media);
 
+    const sectionNorm = normalize(pet.section);
+
     const actionButtons =
       mode === "inquiryOnly"
         ? `
           <button class="buy-btn" style="margin-bottom:10px;" onclick="sendPetInquiry('${escapeSingleQuotes(
             pet.name
-          )}', '${escapeSingleQuotes(pet.price || "")}', '${escapeSingleQuotes(normalizeSection(pet.section))}')">
+          )}', '${escapeSingleQuotes(pet.price || "")}', '${escapeSingleQuotes(sectionNorm)}')">
             Inquire on WhatsApp
           </button>
           <button class="buy-btn" onclick="addToCart('${escapeSingleQuotes(pet.name)}', '${escapeSingleQuotes(
@@ -167,7 +227,7 @@ function renderGrid(petsToDisplay, containerId, emptyStateId, mode = "normal") {
       }
       <div class="pet-info">
         <h3 class="pet-name">${pet.name}</h3>
-        <p class="pet-price">${pet.price || ""}</p>
+        <p class="pet-price">${pet.price ?? ""}</p>
         ${actionButtons}
       </div>
     `;
@@ -177,19 +237,21 @@ function renderGrid(petsToDisplay, containerId, emptyStateId, mode = "normal") {
 
 function renderCurrentView() {
   if (currentView === "home") {
-    const list = activeLists.home.slice(0, visibleCounts.home);
-    renderGrid(list, "home-pets-container", null, "normal");
+    renderGrid(activeLists.home.slice(0, visibleCounts.home), "home-pets-container", null, "normal");
     renderGrid(featuredPets, "featured-pets-container", null, "normal");
   }
 
   if (currentView === "sale") {
-    const list = activeLists.sale.slice(0, visibleCounts.sale);
-    renderGrid(list, "sale-pets-container", "sale-empty", "inquiryOnly");
+    renderGrid(activeLists.sale.slice(0, visibleCounts.sale), "sale-pets-container", "sale-empty", "inquiryOnly");
   }
 
   if (currentView === "adoption") {
-    const list = activeLists.adoption.slice(0, visibleCounts.adoption);
-    renderGrid(list, "adoption-pets-container", "adoption-empty", "inquiryOnly");
+    renderGrid(
+      activeLists.adoption.slice(0, visibleCounts.adoption),
+      "adoption-pets-container",
+      "adoption-empty",
+      "inquiryOnly"
+    );
   }
 }
 
@@ -202,9 +264,7 @@ async function loadPets() {
   const loading = document.getElementById("home-loading");
   if (loading) loading.style.display = "none";
 
-  if (success) {
-    renderCurrentView();
-  }
+  if (success) renderCurrentView();
 
   startAutoRefresh();
 
@@ -220,14 +280,6 @@ async function loadPets() {
 async function silentUpdateInventory() {
   const success = await fetchPetData();
   if (!success) return;
-
-  // keep current sort settings when refreshing
-  const saleSort = document.getElementById("sale-sort")?.value || "newest";
-  const adoptionSort = document.getElementById("adoption-sort")?.value || "newest";
-
-  applySortToList("sale", saleSort, false);
-  applySortToList("adoption", adoptionSort, false);
-
   renderCurrentView();
 }
 
@@ -249,7 +301,6 @@ function switchPage(pageId) {
   if (target) target.classList.add("active");
 
   window.scrollTo({ top: 0, behavior: "smooth" });
-
   renderCurrentView();
 }
 
@@ -257,52 +308,23 @@ function switchPage(pageId) {
 // FILTER / SORT / SEARCH / PAGINATION
 // ==============================
 function filterPage(pageType, category, buttonElement) {
+  selectedCategory[pageType] = category;
+
   const filterGroup = buttonElement?.parentElement;
   if (filterGroup) {
     filterGroup.querySelectorAll(".filter-btn").forEach((btn) => btn.classList.remove("active-filter"));
     buttonElement.classList.add("active-filter");
   }
 
-  let baseList = pageType === "sale" ? salePets : adoptionPets;
-
-  if (category === "all") {
-    activeLists[pageType] = [...baseList];
-  } else {
-    activeLists[pageType] = baseList.filter((pet) =>
-      (pet.category || "").toLowerCase().includes(category.toLowerCase())
-    );
-  }
-
-  // re-apply sort currently selected
-  const sortVal = document.getElementById(`${pageType}-sort`)?.value || "newest";
-  applySortToList(pageType, sortVal, false);
-
   visibleCounts[pageType] = PAGE_SIZE;
+  rebuildActiveLists();
   renderCurrentView();
 }
 
-function applySortToList(pageType, sortValue, reRender = true) {
-  if (!["sale", "adoption"].includes(pageType)) return;
-
-  if (sortValue === "priceLow") {
-    activeLists[pageType].sort((a, b) => parsePriceToNumber(a.price) - parsePriceToNumber(b.price));
-  } else {
-    // newest
-    activeLists[pageType].sort((a, b) => {
-      const da = new Date(a.created_at || 0).getTime();
-      const db = new Date(b.created_at || 0).getTime();
-      return db - da;
-    });
-  }
-
-  if (reRender) {
-    visibleCounts[pageType] = PAGE_SIZE;
-    renderCurrentView();
-  }
-}
-
 function sortPage(pageType, sortValue) {
-  applySortToList(pageType, sortValue, true);
+  visibleCounts[pageType] = PAGE_SIZE;
+  rebuildActiveLists();
+  renderCurrentView();
 }
 
 function loadMore(pageType) {
@@ -311,28 +333,10 @@ function loadMore(pageType) {
 }
 
 function handleGlobalSearch() {
-  const input = (document.getElementById("globalSearch")?.value || "").toLowerCase().trim();
-
-  const matcher = (pet) =>
-    (pet.name || "").toLowerCase().includes(input) ||
-    (pet.category || "").toLowerCase().includes(input);
-
-  if (currentView === "home") {
-    activeLists.home = input ? allPets.filter(matcher) : [...allPets];
-    visibleCounts.home = PAGE_SIZE;
-  } else if (currentView === "sale") {
-    // preserve currently filtered sale set base from salePets
-    activeLists.sale = input ? salePets.filter(matcher) : [...salePets];
-    const sortVal = document.getElementById("sale-sort")?.value || "newest";
-    applySortToList("sale", sortVal, false);
-    visibleCounts.sale = PAGE_SIZE;
-  } else if (currentView === "adoption") {
-    activeLists.adoption = input ? adoptionPets.filter(matcher) : [...adoptionPets];
-    const sortVal = document.getElementById("adoption-sort")?.value || "newest";
-    applySortToList("adoption", sortVal, false);
-    visibleCounts.adoption = PAGE_SIZE;
-  }
-
+  visibleCounts.home = PAGE_SIZE;
+  visibleCounts.sale = PAGE_SIZE;
+  visibleCounts.adoption = PAGE_SIZE;
+  rebuildActiveLists();
   renderCurrentView();
 }
 
@@ -387,7 +391,7 @@ function updateCartUI() {
   });
 
   cartBadge.innerText = cart.length;
-  cartTotal.innerText = sum.toLocaleString(undefined, { minimumFractionDigits: 2 });
+  cartTotal.innerText = sum.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function checkout(whatsappNumber) {
@@ -404,25 +408,25 @@ function checkout(whatsappNumber) {
     total += item.price || 0;
   });
 
-  message += `\n*Total Due: ${total.toLocaleString(undefined, { minimumFractionDigits: 2 })}*`;
+  message += `\n*Total Due: ${total.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}*`;
   window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
 }
 
 // ==============================
-// WHATSAPP INQUIRY-ONLY MODE
+// WHATSAPP INQUIRY MODE
 // ==============================
 function sendPetInquiry(petName, petPrice, section) {
   const whatsappNumber = "13075337422";
-  const typeLabel = section === "adoption" ? "Adoption Inquiry" : "Sale Inquiry";
+  const typeLabel = normalize(section) === "adoption" ? "Adoption Inquiry" : "Sale Inquiry";
 
   const message =
-    `Hello The Pet Nest!%0A%0A` +
-    `I want to make a ${typeLabel}.%0A` +
-    `Pet: ${encodeURIComponent(petName)}%0A` +
-    `Price: ${encodeURIComponent(petPrice || "N/A")}%0A%0A` +
+    `Hello The Pet Nest!\n\n` +
+    `I want to make a ${typeLabel}.\n` +
+    `Pet: ${petName}\n` +
+    `Price: ${petPrice || "N/A"}\n\n` +
     `Please share full details and availability.`;
 
-  window.open(`https://wa.me/${whatsappNumber}?text=${message}`, "_blank");
+  window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, "_blank");
 }
 
 // ==============================
