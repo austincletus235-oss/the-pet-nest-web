@@ -2,32 +2,33 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
-  <title>The Pet Nest | Premium Pet Store</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600;700&display=swap" rel="stylesheet">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Pet Nest</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-<body id="top">
-
+<body>
   <header>
-    <div class="logo" onclick="switchPage('home')">
-      <img src="logo.png" alt="Logo" class="logo-img" onerror="this.src='https://placehold.co/85x85/1e3c5a/FFF?text=PN'">
-      The Pet Nest
-    </div>
+    <a class="logo" onclick="switchPage('home')">
+      <img src="logo.png" class="logo-img" alt="The Pet Nest logo" onerror="this.style.display='none'" />
+      <span>The Pet Nest</span>
+    </a>
 
     <div class="header-controls">
       <div class="search-bar">
-        <input type="text" id="globalSearch" placeholder="Search pets..." onkeyup="handleGlobalSearch()">
-        🔍
+        <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" />
       </div>
 
       <div class="cart-icon" onclick="toggleCart()">
-        🛒 <span style="font-size: 1rem;">Cart</span>
+        🛒 Cart
         <span class="cart-count" id="cart-badge">0</span>
       </div>
-    </div>
 
-    <button class="hamburger" onclick="toggleMenu()">☰</button>
+      <button class="hamburger" onclick="toggleMenu()">☰</button>
+    </div>
 
     <nav class="nav-links" id="navMenu">
       <a onclick="switchPage('home')">Home</a>
@@ -36,139 +37,121 @@
     </nav>
   </header>
 
-  <div class="floating-container">
-    <a href="https://wa.me/13075337422?text=Hello%20Pet%20Nest!%20I%20need%20some%20assistance." target="_blank" class="float-btn wa-btn">💬 Customer Care</a>
-    <a href="#top" class="float-btn home-btn" id="homeBtn">⬆️</a>
-  </div>
+  <!-- HOME -->
+  <main id="view-home" class="page-view active">
+    <section class="hero">
+      <h1>Bring Home a Lifetime of Joy</h1>
+      <p>Premium, healthy companions raised with love.</p>
+      <div class="hero-checks">
+        <span>100% Healthy</span><span>•</span><span>Vet Checked</span><span>•</span><span>Licensed</span>
+      </div>
+    </section>
 
-  <div class="cart-overlay" id="cart-overlay">
+    <section class="container">
+      <h2 class="section-header">⭐ Featured Pets</h2>
+      <div id="featured-pets-container" class="pet-grid"></div>
+    </section>
+
+    <section class="container">
+      <h2 class="section-header">✨ Exclusive New Arrivals ✨</h2>
+      <p id="home-loading" class="loading">Loading inventory...</p>
+      <div id="home-pets-container" class="pet-grid"></div>
+      <div style="text-align:center;margin-top:18px;">
+        <button class="filter-btn" onclick="loadMore('home')">Load More</button>
+      </div>
+    </section>
+  </main>
+
+  <!-- SALE -->
+  <main id="view-sale" class="page-view">
+    <div class="container">
+      <div class="fancy-page-header">
+        <h2>Pets for Sale</h2>
+        <p>Choose your perfect companion.</p>
+      </div>
+
+      <div class="page-filters">
+        <button class="filter-btn active-filter" onclick="filterPage('sale','all',this)">All</button>
+        <button class="filter-btn" onclick="filterPage('sale','dog',this)">Dogs</button>
+        <button class="filter-btn" onclick="filterPage('sale','cat',this)">Cats</button>
+        <button class="filter-btn" onclick="filterPage('sale','bird',this)">Birds</button>
+        <button class="filter-btn" onclick="filterPage('sale','other',this)">Other</button>
+      </div>
+
+      <div id="sale-empty" class="empty-state">
+        <div class="empty-icon">🐾</div>
+        <h3>No sale pets found</h3>
+        <p>Please check back soon.</p>
+      </div>
+
+      <div id="sale-pets-container" class="pet-grid"></div>
+      <div style="text-align:center;margin-top:18px;">
+        <button class="filter-btn" onclick="loadMore('sale')">Load More</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- ADOPTION -->
+  <main id="view-adoption" class="page-view">
+    <div class="container">
+      <div class="fancy-page-header">
+        <h2>Pets for Adoption</h2>
+        <p>Give a loving home to a pet in need.</p>
+      </div>
+
+      <div class="page-filters">
+        <button class="filter-btn active-filter" onclick="filterPage('adoption','all',this)">All</button>
+        <button class="filter-btn" onclick="filterPage('adoption','dog',this)">Dogs</button>
+        <button class="filter-btn" onclick="filterPage('adoption','cat',this)">Cats</button>
+        <button class="filter-btn" onclick="filterPage('adoption','bird',this)">Birds</button>
+        <button class="filter-btn" onclick="filterPage('adoption','other',this)">Other</button>
+      </div>
+
+      <div id="adoption-empty" class="empty-state">
+        <div class="empty-icon">🏠</div>
+        <h3>No adoption pets found</h3>
+        <p>Please check back soon.</p>
+      </div>
+
+      <div id="adoption-pets-container" class="pet-grid"></div>
+      <div style="text-align:center;margin-top:18px;">
+        <button class="filter-btn" onclick="loadMore('adoption')">Load More</button>
+      </div>
+    </div>
+  </main>
+
+  <!-- CART -->
+  <div id="cart-overlay" class="cart-overlay">
     <div class="cart-panel">
       <div class="cart-header">
-        <h2>Your Cart</h2>
-        <button class="close-cart" onclick="toggleCart()">✖</button>
+        <h3>Your Cart</h3>
+        <button class="close-cart" onclick="toggleCart()">✕</button>
       </div>
-      <div class="cart-items" id="cart-items"></div>
+      <div id="cart-items" class="cart-items"></div>
       <div class="cart-footer">
         <div class="cart-total">
           <span>Total:</span>
           <span id="cart-total-price">0</span>
         </div>
-        <button class="checkout-btn" onclick="checkout('13075337422')">Buy</button>
+        <button class="checkout-btn" onclick="checkout()">Checkout via WhatsApp</button>
       </div>
     </div>
   </div>
 
-  <div id="view-home" class="page-view active">
-    <div class="hero">
-      <h1>Bring Home a Lifetime of Joy</h1>
-      <p>Premium, healthy companions raised with love. Discover your perfect family member today.</p>
-      <div class="hero-checks">
-        <span>✓ 100% Healthy</span>
-        <span>✓ Vet Checked</span>
-        <span>✓ Licensed</span>
-      </div>
-    </div>
-
-    <div class="category-wrapper">
-      <h2>Shop By Categories</h2>
-      <div class="visual-categories">
-        <div class="cat-mini-banner bg-all"><div class="emoji">🐾</div><span>All Pets</span></div>
-        <div class="cat-mini-banner bg-dog"><div class="emoji">🐕</div><span>Dogs</span></div>
-        <div class="cat-mini-banner bg-cat"><div class="emoji">🐈</div><span>Cats</span></div>
-        <div class="cat-mini-banner bg-bird"><div class="emoji">🦜</div><span>Birds</span></div>
-      </div>
-    </div>
-
-    <div class="promo-container">
-      <div class="promo-card blue"><h3>Premium Nutrition</h3><p>Natural Freeze Dried Foods</p></div>
-      <div class="promo-card red"><h3>Summer Sale</h3><p>Deals Up to 25% Off</p></div>
-      <div class="promo-card orange"><h3>Accessories</h3><p>Branded Pet Gear & Toys</p></div>
-    </div>
-
-    <div class="container">
-      <h2 class="section-header">⭐ Featured Pets</h2>
-      <div id="featured-pets-container" class="pet-grid"></div>
-    </div>
-
-    <div class="container">
-      <h2 class="section-header">✨ Exclusive New Arrivals ✨</h2>
-      <div id="home-loading" class="loading">Loading inventory...</div>
-      <div id="home-pets-container" class="pet-grid"></div>
-      <div style="text-align:center; margin-top:20px;">
-        <button class="filter-btn" onclick="loadMore('home')">Load More</button>
-      </div>
-    </div>
-  </div>
-
-  <div id="view-sale" class="page-view">
-    <div class="container">
-      <div class="fancy-page-header">
-        <h2>Premium Pets for Sale</h2>
-        <p>Hand-selected, vet-checked, and lovingly raised companions ready to join your family.</p>
-      </div>
-
-      <div class="page-filters">
-        <button class="filter-btn active-filter" onclick="filterPage('sale', 'all', this)">All</button>
-        <button class="filter-btn" onclick="filterPage('sale', 'dog', this)">Dogs</button>
-        <button class="filter-btn" onclick="filterPage('sale', 'cat', this)">Cats</button>
-        <button class="filter-btn" onclick="filterPage('sale', 'bird', this)">Birds</button>
-        <select id="sale-sort" class="filter-btn" onchange="sortPage('sale', this.value)">
-          <option value="newest">Sort: Newest</option>
-          <option value="priceLow">Price: Low → High</option>
-        </select>
-      </div>
-
-      <div id="sale-pets-container" class="pet-grid"></div>
-      <div style="text-align:center; margin-top:20px;">
-        <button class="filter-btn" onclick="loadMore('sale')">Load More</button>
-      </div>
-
-      <div id="sale-empty" class="empty-state">
-        <div class="empty-icon">🐾</div>
-        <h3>Currently Unavailable</h3>
-        <p>No pets for sale right now. Check back shortly.</p>
-      </div>
-    </div>
-  </div>
-
-  <div id="view-adoption" class="page-view">
-    <div class="container">
-      <div class="fancy-page-header">
-        <h2>Pets Looking for Forever Homes</h2>
-        <p>Give a deserving companion a second chance. All adoption pets are fully vetted and ready for love.</p>
-      </div>
-
-      <div class="page-filters">
-        <button class="filter-btn active-filter" onclick="filterPage('adoption', 'all', this)">All</button>
-        <button class="filter-btn" onclick="filterPage('adoption', 'dog', this)">Dogs</button>
-        <button class="filter-btn" onclick="filterPage('adoption', 'cat', this)">Cats</button>
-        <button class="filter-btn" onclick="filterPage('adoption', 'bird', this)">Birds</button>
-        <select id="adoption-sort" class="filter-btn" onchange="sortPage('adoption', this.value)">
-          <option value="newest">Sort: Newest</option>
-          <option value="priceLow">Price: Low → High</option>
-        </select>
-      </div>
-
-      <div id="adoption-pets-container" class="pet-grid"></div>
-      <div style="text-align:center; margin-top:20px;">
-        <button class="filter-btn" onclick="loadMore('adoption')">Load More</button>
-      </div>
-
-      <div id="adoption-empty" class="empty-state">
-        <div class="empty-icon">🏠</div>
-        <h3>Currently Unavailable</h3>
-        <p>There are no pets available for adoption at this moment. Please check back soon!</p>
-      </div>
-    </div>
+  <div class="floating-container">
+    <a id="homeBtn" class="float-btn home-btn" onclick="switchPage('home')">↑</a>
+    <a class="float-btn wa-btn" target="_blank"
+       href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest!%20I%20need%20help.">
+      💬 Customer Care
+    </a>
   </div>
 
   <footer>
     <h3>The Pet Nest</h3>
     <p>Delivering joy, one pet at a time.</p>
-    <p style="margin-top: 20px;">© 2026 The Pet Nest. All rights reserved.</p>
+    <p>© 2026 The Pet Nest. All rights reserved.</p>
   </footer>
 
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script src="app.js"></script>
 </body>
 </html>
