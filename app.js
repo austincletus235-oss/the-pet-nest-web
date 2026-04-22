@@ -13,8 +13,22 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
+// Check Online Status
+function updateNetworkStatus() {
+  const banner = document.getElementById('offline-banner');
+  if (navigator.onLine) {
+    banner.classList.remove('active');
+    // Re-fetch pets when coming back online
+    fetchPets().then(() => renderCurrentView());
+  } else {
+    banner.classList.add('active');
+  }
+}
+window.addEventListener('online', updateNetworkStatus);
+window.addEventListener('offline', updateNetworkStatus);
+
 function n(v) { return String(v || "").toLowerCase().trim(); }
-function safeText(v = "") { return String(v).replace(/'/g, "\\'"); }
+function safeText(v = "") { return String(v).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
 function numericPrice(v) {
   const parsed = parseFloat(String(v ?? "").replace(/[^\d.-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
@@ -47,7 +61,8 @@ function switchPage(page) {
 }
 
 async function fetchPets() {
-  // Added description to the select query
+  if (!navigator.onLine) return false;
+
   const { data, error } = await supabaseClient
     .from("pets")
     .select("id,name,price,category,section,status,media_url,description,created_at")
@@ -78,26 +93,40 @@ function applyCategory(list, cat) {
   return list.filter((p) => n(p.category) === cat);
 }
 
-// Media Modal Functions
-function openMedia(url, isVid) {
+// -- NEW PROFESSIONAL MODAL LOGIC --
+function openMedia(url, isVid, title, desc) {
   if (!url || url === "null" || url.includes("placehold.co")) return;
   const modal = document.getElementById("media-modal");
-  const content = document.getElementById("media-modal-content");
+  const mediaContainer = document.getElementById("media-modal-media");
+  const titleEl = document.getElementById("media-modal-title");
+  const descEl = document.getElementById("media-modal-desc");
   
+  // Insert Image or Video properly constrained
   if (isVid) {
-    content.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
+    mediaContainer.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
   } else {
-    content.innerHTML = `<img src="${url}" alt="Pet Media">`;
+    mediaContainer.innerHTML = `<img src="${url}" alt="Pet Image">`;
   }
+
+  // Insert Text
+  titleEl.textContent = title || "Pet Details";
+  descEl.textContent = desc || "No details provided.";
+
   modal.classList.add("active");
 }
 
 function closeMedia() {
   const modal = document.getElementById("media-modal");
-  const content = document.getElementById("media-modal-content");
+  const mediaContainer = document.getElementById("media-modal-media");
+  
   modal.classList.remove("active");
-  content.innerHTML = ""; // Clear content to stop video playing
+  
+  // Clear the media after the fade animation finishes to stop videos from playing in the background
+  setTimeout(() => {
+    mediaContainer.innerHTML = "";
+  }, 300);
 }
+
 
 function petCardTemplate(p) {
   const media = p.media_url || "https://placehold.co/400x300?text=No+Image";
@@ -107,9 +136,17 @@ function petCardTemplate(p) {
   const desc = p.description || "";
   const isVid = isVideo(media);
 
+  const safeName = safeText(petName);
+  const safeDesc = safeText(desc);
+
+  // Add the Read More button logic
+  const readMoreHtml = desc.trim() !== "" 
+    ? `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">Read more</span>` 
+    : `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">View Media</span>`;
+
   return `
     <div class="pet-card">
-      <div class="pet-media-wrap" onclick="openMedia('${media}', ${isVid})">
+      <div class="pet-media-wrap" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">
         ${
           isVid
             ? `<video class="pet-image" src="${media}" autoplay muted loop playsinline preload="metadata"></video>`
@@ -119,10 +156,11 @@ function petCardTemplate(p) {
       <div class="pet-info">
         <h3 class="pet-name">${petName}</h3>
         <p class="pet-price">${petPrice}</p>
-        <p class="pet-desc" title="${safeText(desc)}">${desc}</p>
+        <p class="pet-desc" title="${safeDesc}">${desc}</p>
+        ${readMoreHtml}
         <div class="pet-actions">
-          <button class="buy-btn" onclick="buyNow('${safeText(petName)}','${safeText(petPrice)}','${safeText(section)}')">Buy</button>
-          <button class="cart-btn" onclick="addToCart('${safeText(petName)}','${safeText(petPrice)}')">Add to Cart</button>
+          <button class="buy-btn" onclick="buyNow('${safeName}','${petPrice}','${section}')">Buy</button>
+          <button class="cart-btn" onclick="addToCart('${safeName}','${petPrice}')">Add to Cart</button>
         </div>
       </div>
     </div>
@@ -254,13 +292,20 @@ window.onscroll = function () {
 };
 
 async function init() {
-  await fetchPets();
+  updateNetworkStatus();
+  
+  if (navigator.onLine) {
+    await fetchPets();
+  }
+  
   renderCurrentView();
   updateCartUI();
 
   setInterval(async () => {
-    await fetchPets();
-    renderCurrentView();
+    if (navigator.onLine) {
+      await fetchPets();
+      renderCurrentView();
+    }
   }, 60000);
 }
 
