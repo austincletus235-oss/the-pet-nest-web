@@ -4,22 +4,38 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>The Pet Nest</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com">
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap"
+    rel="stylesheet"
+  />
+
   <link rel="stylesheet" href="style.css" />
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+  <!-- HEADER -->
   <header>
     <a class="logo" onclick="switchPage('home')">
-      <img src="logo.png" class="logo-img" alt="The Pet Nest logo" onerror="this.style.display='none'" />
+      <img
+        src="logo.png"
+        class="logo-img"
+        alt="The Pet Nest"
+        onerror="this.style.display='none'"
+      />
       <span>The Pet Nest</span>
     </a>
 
     <div class="header-controls">
       <div class="search-bar">
-        <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" />
+        <input
+          id="globalSearch"
+          type="text"
+          placeholder="Search pets..."
+          oninput="handleGlobalSearch()"
+        />
       </div>
 
       <div class="cart-icon" onclick="toggleCart()">
@@ -41,9 +57,52 @@
   <main id="view-home" class="page-view active">
     <section class="hero">
       <h1>Bring Home a Lifetime of Joy</h1>
-      <p>Premium, healthy companions raised with love.</p>
+      <p>Premium, healthy companions raised with love. Discover your perfect family member today.</p>
       <div class="hero-checks">
-        <span>100% Healthy</span><span>•</span><span>Vet Checked</span><span>•</span><span>Licensed</span>
+        <span>100% Healthy</span>
+        <span>•</span>
+        <span>Vet Checked</span>
+        <span>•</span>
+        <span>Licensed</span>
+      </div>
+    </section>
+
+    <!-- KEEPING YOUR EMOJI CATEGORY DESIGN -->
+    <section class="category-wrapper">
+      <h2>Shop By Categories</h2>
+      <div class="visual-categories">
+        <div class="cat-mini-banner bg-all">
+          <div class="emoji">🐾</div>
+          <span>All Pets</span>
+        </div>
+        <div class="cat-mini-banner bg-dog">
+          <div class="emoji">🐶</div>
+          <span>Dogs</span>
+        </div>
+        <div class="cat-mini-banner bg-cat">
+          <div class="emoji">🐱</div>
+          <span>Cats</span>
+        </div>
+        <div class="cat-mini-banner bg-bird">
+          <div class="emoji">🦜</div>
+          <span>Birds</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- KEEPING YOUR PROMO BANNERS -->
+    <section class="promo-container">
+      <div class="promo-card blue">
+        <h3>Premium Nutrition</h3>
+        <p>Natural Freeze Dried Foods</p>
+      </div>
+      <div class="promo-card red">
+        <h3>Summer Sale</h3>
+        <p>Deals Up to 25% Off</p>
+      </div>
+      <div class="promo-card orange">
+        <h3>Accessories</h3>
+        <p>Branded Pet Gear & Toys</p>
       </div>
     </section>
 
@@ -56,7 +115,7 @@
       <h2 class="section-header">✨ Exclusive New Arrivals ✨</h2>
       <p id="home-loading" class="loading">Loading inventory...</p>
       <div id="home-pets-container" class="pet-grid"></div>
-      <div style="text-align:center;margin-top:18px;">
+      <div style="text-align: center; margin-top: 18px;">
         <button class="filter-btn" onclick="loadMore('home')">Load More</button>
       </div>
     </section>
@@ -85,7 +144,8 @@
       </div>
 
       <div id="sale-pets-container" class="pet-grid"></div>
-      <div style="text-align:center;margin-top:18px;">
+
+      <div style="text-align: center; margin-top: 18px;">
         <button class="filter-btn" onclick="loadMore('sale')">Load More</button>
       </div>
     </div>
@@ -114,7 +174,8 @@
       </div>
 
       <div id="adoption-pets-container" class="pet-grid"></div>
-      <div style="text-align:center;margin-top:18px;">
+
+      <div style="text-align: center; margin-top: 18px;">
         <button class="filter-btn" onclick="loadMore('adoption')">Load More</button>
       </div>
     </div>
@@ -127,7 +188,9 @@
         <h3>Your Cart</h3>
         <button class="close-cart" onclick="toggleCart()">✕</button>
       </div>
+
       <div id="cart-items" class="cart-items"></div>
+
       <div class="cart-footer">
         <div class="cart-total">
           <span>Total:</span>
@@ -138,14 +201,20 @@
     </div>
   </div>
 
+  <!-- FLOATING -->
   <div class="floating-container">
     <a id="homeBtn" class="float-btn home-btn" onclick="switchPage('home')">↑</a>
-    <a class="float-btn wa-btn" target="_blank"
-       href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest!%20I%20need%20help.">
+    <a
+      class="float-btn wa-btn"
+      href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest%2C%20I%20need%20help."
+      target="_blank"
+      rel="noopener"
+    >
       💬 Customer Care
     </a>
   </div>
 
+  <!-- FOOTER -->
   <footer>
     <h3>The Pet Nest</h3>
     <p>Delivering joy, one pet at a time.</p>
