@@ -21,7 +21,8 @@
 
     <div class="header-controls">
       <div class="search-bar">
-        <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" />
+        <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" onkeypress="if(event.key === 'Enter') handleGlobalSearch()" />
+        <button onclick="handleGlobalSearch()" class="search-btn">🔍</button>
       </div>
 
       <div class="cart-icon" onclick="toggleCart()">
@@ -39,7 +40,7 @@
     </nav>
   </header>
 
-  <!-- HOME -->
+  <!-- HOME (No pets here, just banners and unclickable categories) -->
   <main id="view-home" class="page-view active">
     <section class="hero">
       <h1>Bring Home a Lifetime of Joy</h1>
@@ -52,10 +53,18 @@
     <section class="category-wrapper">
       <h2>Shop By Categories</h2>
       <div class="visual-categories">
-        <div class="cat-mini-banner bg-all"><div class="emoji">🐾</div><span>All Pets</span></div>
-        <div class="cat-mini-banner bg-dog"><div class="emoji">🐶</div><span>Dogs</span></div>
-        <div class="cat-mini-banner bg-cat"><div class="emoji">🐱</div><span>Cats</span></div>
-        <div class="cat-mini-banner bg-bird"><div class="emoji">🦜</div><span>Birds</span></div>
+        <div class="cat-mini-banner bg-all">
+          <div class="emoji">🐾</div><span>All Pets</span>
+        </div>
+        <div class="cat-mini-banner bg-dog">
+          <div class="emoji">🐶</div><span>Dogs</span>
+        </div>
+        <div class="cat-mini-banner bg-cat">
+          <div class="emoji">🐱</div><span>Cats</span>
+        </div>
+        <div class="cat-mini-banner bg-bird">
+          <div class="emoji">🦜</div><span>Birds</span>
+        </div>
       </div>
     </section>
 
@@ -73,23 +82,9 @@
         <p>Branded Pet Gear & Toys</p>
       </div>
     </section>
-
-    <section class="container">
-      <h2 class="section-header">⭐ Featured Pets</h2>
-      <div id="featured-pets-container" class="pet-grid"></div>
-    </section>
-
-    <section class="container">
-      <h2 class="section-header">✨ Exclusive New Arrivals ✨</h2>
-      <p id="home-loading" class="loading">Loading inventory...</p>
-      <div id="home-pets-container" class="pet-grid"></div>
-      <div style="text-align:center;margin-top:18px;">
-        <button class="filter-btn" onclick="loadMore('home')">Load More</button>
-      </div>
-    </section>
   </main>
 
-  <!-- SALE -->
+  <!-- SALE (Pets show up here) -->
   <main id="view-sale" class="page-view">
     <div class="container">
       <div class="fancy-page-header">
@@ -118,7 +113,7 @@
     </div>
   </main>
 
-  <!-- ADOPTION -->
+  <!-- ADOPTION (Pets show up here) -->
   <main id="view-adoption" class="page-view">
     <div class="container">
       <div class="fancy-page-header">
@@ -166,7 +161,7 @@
   </div>
 
   <div class="floating-container">
-    <a id="homeBtn" class="float-btn home-btn" onclick="switchPage('home')">↑</a>
+    <a id="homeBtn" class="float-btn home-btn" onclick="window.scrollTo(0,0)">↑</a>
     <a class="float-btn wa-btn" target="_blank" href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest!%20I%20need%20help.">
       💬 Customer Care
     </a>
