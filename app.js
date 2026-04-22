@@ -39,7 +39,6 @@ function switchPage(page) {
   document.getElementById("navMenu")?.classList.remove("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
   
-  // Clear search when switching to home manually
   if (page === "home" && document.getElementById("globalSearch")) {
     document.getElementById("globalSearch").value = "";
   }
@@ -48,9 +47,10 @@ function switchPage(page) {
 }
 
 async function fetchPets() {
+  // Added description to the select query
   const { data, error } = await supabaseClient
     .from("pets")
-    .select("id,name,price,category,section,status,media_url,created_at")
+    .select("id,name,price,category,section,status,media_url,description,created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
@@ -78,17 +78,40 @@ function applyCategory(list, cat) {
   return list.filter((p) => n(p.category) === cat);
 }
 
+// Media Modal Functions
+function openMedia(url, isVid) {
+  if (!url || url === "null" || url.includes("placehold.co")) return;
+  const modal = document.getElementById("media-modal");
+  const content = document.getElementById("media-modal-content");
+  
+  if (isVid) {
+    content.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
+  } else {
+    content.innerHTML = `<img src="${url}" alt="Pet Media">`;
+  }
+  modal.classList.add("active");
+}
+
+function closeMedia() {
+  const modal = document.getElementById("media-modal");
+  const content = document.getElementById("media-modal-content");
+  modal.classList.remove("active");
+  content.innerHTML = ""; // Clear content to stop video playing
+}
+
 function petCardTemplate(p) {
   const media = p.media_url || "https://placehold.co/400x300?text=No+Image";
   const petName = p.name || "";
   const petPrice = formatPrice(p.price);
   const section = n(p.section);
+  const desc = p.description || "";
+  const isVid = isVideo(media);
 
   return `
     <div class="pet-card">
-      <div class="pet-media-wrap">
+      <div class="pet-media-wrap" onclick="openMedia('${media}', ${isVid})">
         ${
-          isVideo(media)
+          isVid
             ? `<video class="pet-image" src="${media}" autoplay muted loop playsinline preload="metadata"></video>`
             : `<img class="pet-image" src="${media}" alt="${petName}" loading="lazy" onerror="this.src='https://placehold.co/400x300?text=No+Image'">`
         }
@@ -96,6 +119,7 @@ function petCardTemplate(p) {
       <div class="pet-info">
         <h3 class="pet-name">${petName}</h3>
         <p class="pet-price">${petPrice}</p>
+        <p class="pet-desc" title="${safeText(desc)}">${desc}</p>
         <div class="pet-actions">
           <button class="buy-btn" onclick="buyNow('${safeText(petName)}','${safeText(petPrice)}','${safeText(section)}')">Buy</button>
           <button class="cart-btn" onclick="addToCart('${safeText(petName)}','${safeText(petPrice)}')">Add to Cart</button>
@@ -129,7 +153,6 @@ function renderGrid(containerId, items, emptyId = null) {
 function renderCurrentView() {
   const term = getSearchTerm();
 
-  // ONLY render Sale and Adoption grids (Home is completely empty of pets now)
   let sList = applyCategory(salePets, selectedCategory.sale);
   sList = applySearch(sList, term).slice(0, visibleCounts.sale);
   renderGrid("sale-pets-container", sList, "sale-empty");
@@ -151,8 +174,6 @@ function filterPage(pageType, category, btn) {
 }
 
 function handleGlobalSearch() {
-  // If the user searches while on the Home page, automatically jump to the "Sale" page 
-  // so they can actually see the pets they searched for.
   if (currentView === "home" && getSearchTerm() !== "") {
     switchPage("sale");
   } else {
@@ -167,7 +188,6 @@ function loadMore(pageType) {
   renderCurrentView();
 }
 
-// CART AND WHATSAPP FUNCTIONS
 function toggleCart() { document.getElementById("cart-overlay")?.classList.toggle("active"); }
 
 function addToCart(name, priceText) {
