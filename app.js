@@ -1,54 +1,76 @@
+// ==============================
+// THE PET NEST - FINAL WEB APP
+// ==============================
+
 const SUPABASE_URL = "https://mbpdimmuuzrxgsraofew.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1icGRpbW11dXpyeGdzcmFvZmV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDYwNjAsImV4cCI6MjA5MTk4MjA2MH0.g54oYMrrChSGr_fRpMwFIYp5LAQcV1hzIJqvRXpjj6E";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// ---------- STATE ----------
 let allPets = [];
 let salePets = [];
 let adoptionPets = [];
 let featuredPets = [];
 let cart = [];
 
+let currentView = "home";
 const PAGE_SIZE = 8;
 const visibleCounts = { home: PAGE_SIZE, sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-function n(v) { return String(v || "").toLowerCase().trim(); }
-function safeText(v = "") { return String(v).replace(/'/g, "\\'"); }
+// ---------- HELPERS ----------
+function n(v) {
+  return String(v || "").toLowerCase().trim();
+}
+
+function safeText(v = "") {
+  return String(v).replace(/'/g, "\\'");
+}
+
 function numericPrice(v) {
   const parsed = parseFloat(String(v ?? "").replace(/[^\d.-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
 }
+
 function formatPrice(v) {
   const num = numericPrice(v);
   return num ? num.toLocaleString() : String(v ?? "");
 }
+
 function isVideo(url = "") {
   const u = url.toLowerCase();
   return u.includes(".mp4") || u.includes(".webm") || u.includes(".mov") || u.includes(".m4v");
 }
 
+// ---------- NAV ----------
 function toggleMenu() {
   document.getElementById("navMenu")?.classList.toggle("active");
 }
 
 function switchPage(page) {
+  currentView = page;
+
   document.querySelectorAll(".page-view").forEach((el) => el.classList.remove("active"));
   document.getElementById(`view-${page}`)?.classList.add("active");
+
   document.getElementById("navMenu")?.classList.remove("active");
   window.scrollTo({ top: 0, behavior: "smooth" });
+
   renderCurrentView();
 }
 
+// ---------- FETCH ----------
 async function fetchPets() {
+  // FIXED: Removed is_featured from the select list to prevent the database error
   const { data, error } = await supabaseClient
     .from("pets")
-    .select("id,name,price,category,section,status,media_url,is_featured,created_at")
+    .select("id,name,price,category,section,status,media_url,created_at")
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error(error);
+    console.error("Fetch error:", error);
     alert("Fetch error: " + error.message);
     return false;
   }
@@ -59,24 +81,28 @@ async function fetchPets() {
   salePets = visible.filter((p) => n(p.section) === "sale");
   adoptionPets = visible.filter((p) => n(p.section) === "adoption");
 
-  const explicitFeatured = visible.filter((p) => p.is_featured === true);
-  featuredPets = explicitFeatured.length ? explicitFeatured.slice(0, 8) : visible.slice(0, 8);
+  // FIXED: Simply take the newest 8 pets for the featured section since the column doesn't exist
+  featuredPets = visible.slice(0, 8);
 
   return true;
 }
 
+// ---------- FILTER/SEARCH ----------
 function getSearchTerm() {
   return String(document.getElementById("globalSearch")?.value || "").trim().toLowerCase();
 }
+
 function applySearch(list, term) {
   if (!term) return [...list];
   return list.filter((p) => n(p.name).includes(term) || n(p.category).includes(term));
 }
+
 function applyCategory(list, cat) {
   if (cat === "all") return [...list];
   return list.filter((p) => n(p.category) === cat);
 }
 
+// ---------- CARD TEMPLATE ----------
 function petCardTemplate(p) {
   const media = p.media_url || "https://placehold.co/400x300?text=No+Image";
   const petName = p.name || "";
@@ -92,9 +118,11 @@ function petCardTemplate(p) {
             : `<img class="pet-image" src="${media}" alt="${petName}" loading="lazy" onerror="this.src='https://placehold.co/400x300?text=No+Image'">`
         }
       </div>
+
       <div class="pet-info">
         <h3 class="pet-name">${petName}</h3>
         <p class="pet-price">${petPrice}</p>
+
         <div class="pet-actions">
           <button class="buy-btn" onclick="buyNow('${safeText(petName)}','${safeText(petPrice)}','${safeText(section)}')">Buy</button>
           <button class="cart-btn" onclick="addToCart('${safeText(petName)}','${safeText(petPrice)}')">Add to Cart</button>
@@ -104,6 +132,7 @@ function petCardTemplate(p) {
   `;
 }
 
+// ---------- RENDER ----------
 function renderGrid(containerId, items, emptyId = null) {
   const box = document.getElementById(containerId);
   if (!box) return;
@@ -129,19 +158,23 @@ function renderGrid(containerId, items, emptyId = null) {
 function renderCurrentView() {
   const term = getSearchTerm();
 
+  // Home
   const homeList = applySearch(allPets, term).slice(0, visibleCounts.home);
-  renderGrid("home-pets-container", homeList);
-  renderGrid("featured-pets-container", featuredPets);
+  renderGrid("home-pets-container", homeList, null);
+  renderGrid("featured-pets-container", featuredPets, null);
 
+  // Sale
   let sList = applyCategory(salePets, selectedCategory.sale);
   sList = applySearch(sList, term).slice(0, visibleCounts.sale);
   renderGrid("sale-pets-container", sList, "sale-empty");
 
+  // Adoption
   let aList = applyCategory(adoptionPets, selectedCategory.adoption);
   aList = applySearch(aList, term).slice(0, visibleCounts.adoption);
   renderGrid("adoption-pets-container", aList, "adoption-empty");
 }
 
+// ---------- UI ACTIONS ----------
 function filterPage(pageType, category, btn) {
   selectedCategory[pageType] = category;
   visibleCounts[pageType] = PAGE_SIZE;
@@ -150,6 +183,7 @@ function filterPage(pageType, category, btn) {
     btn.parentElement.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active-filter"));
     btn.classList.add("active-filter");
   }
+
   renderCurrentView();
 }
 
@@ -165,6 +199,7 @@ function loadMore(pageType) {
   renderCurrentView();
 }
 
+// ---------- CART ----------
 function toggleCart() {
   document.getElementById("cart-overlay")?.classList.toggle("active");
 }
@@ -212,9 +247,11 @@ function updateCartUI() {
   totalEl.textContent = total.toLocaleString();
 }
 
+// ---------- WHATSAPP ----------
 function buyNow(name, priceText, section) {
   const whatsapp = "13075337422";
   const type = section === "adoption" ? "Adoption Inquiry" : "Purchase Inquiry";
+
   const msg = `Hello The Pet Nest!
 
 ${type}
@@ -222,11 +259,15 @@ Pet: ${name}
 Price: ${priceText}
 
 Please confirm availability.`;
+
   window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
 function checkout() {
-  if (!cart.length) return alert("Cart is empty.");
+  if (!cart.length) {
+    alert("Cart is empty.");
+    return;
+  }
 
   const whatsapp = "13075337422";
   let total = 0;
@@ -249,13 +290,19 @@ Please confirm availability.`;
   window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
+// ---------- SCROLL BUTTON ----------
 window.onscroll = function () {
   const btn = document.getElementById("homeBtn");
   if (!btn) return;
-  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) btn.classList.add("visible");
-  else btn.classList.remove("visible");
+
+  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) {
+    btn.classList.add("visible");
+  } else {
+    btn.classList.remove("visible");
+  }
 };
 
+// ---------- INIT ----------
 async function init() {
   const ok = await fetchPets();
   const loading = document.getElementById("home-loading");
