@@ -1,73 +1,46 @@
-// =========================
-// THE PET NEST - WEB APP
-// Full version with:
-// - Home / Sale / Adoption rendering
-// - Category filters in Sale + Adoption
-// - Buy + Add to Cart buttons on cards
-// - Image/video card rendering
-// - Proper section/status filtering
-// - Cart drawer + WhatsApp checkout
-// =========================
-
 const SUPABASE_URL = "https://mbpdimmuuzrxgsraofew.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1icGRpbW11dXpyeGdzcmFvZmV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDYwNjAsImV4cCI6MjA5MTk4MjA2MH0.g54oYMrrChSGr_fRpMwFIYp5LAQcV1hzIJqvRXpjj6E";
 
 const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-// ---------- State ----------
 let allPets = [];
 let salePets = [];
 let adoptionPets = [];
 let featuredPets = [];
 let cart = [];
-let currentView = "home";
+
 const PAGE_SIZE = 8;
 const visibleCounts = { home: PAGE_SIZE, sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// ---------- Helpers ----------
-const norm = (v) => String(v || "").toLowerCase().trim();
-
+function n(v) { return String(v || "").toLowerCase().trim(); }
+function safeText(v = "") { return String(v).replace(/'/g, "\\'"); }
+function numericPrice(v) {
+  const parsed = parseFloat(String(v ?? "").replace(/[^\d.-]/g, ""));
+  return Number.isFinite(parsed) ? parsed : 0;
+}
+function formatPrice(v) {
+  const num = numericPrice(v);
+  return num ? num.toLocaleString() : String(v ?? "");
+}
 function isVideo(url = "") {
   const u = url.toLowerCase();
   return u.includes(".mp4") || u.includes(".webm") || u.includes(".mov") || u.includes(".m4v");
-}
-
-function safeText(v = "") {
-  return String(v).replace(/'/g, "\\'");
-}
-
-function numericPrice(v) {
-  const n = parseFloat(String(v ?? "").replace(/[^\d.-]/g, ""));
-  return Number.isFinite(n) ? n : 0;
-}
-
-function formatPrice(v) {
-  const n = numericPrice(v);
-  return n.toLocaleString();
-}
-
-// ---------- Navigation ----------
-function switchPage(page) {
-  currentView = page;
-
-  document.querySelectorAll(".page-view").forEach((el) => el.classList.remove("active"));
-  const target = document.getElementById(`view-${page}`);
-  if (target) target.classList.add("active");
-
-  // close mobile menu if any
-  document.getElementById("navMenu")?.classList.remove("active");
-
-  renderCurrentView();
-  window.scrollTo({ top: 0, behavior: "smooth" });
 }
 
 function toggleMenu() {
   document.getElementById("navMenu")?.classList.toggle("active");
 }
 
-// ---------- Data ----------
+function switchPage(page) {
+  document.querySelectorAll(".page-view").forEach((el) => el.classList.remove("active"));
+  document.getElementById(`view-${page}`)?.classList.add("active");
+  document.getElementById("navMenu")?.classList.remove("active");
+  window.scrollTo({ top: 0, behavior: "smooth" });
+  renderCurrentView();
+}
+
 async function fetchPets() {
   const { data, error } = await supabaseClient
     .from("pets")
@@ -75,18 +48,16 @@ async function fetchPets() {
     .order("created_at", { ascending: false });
 
   if (error) {
-    console.error("Fetch pets error:", error.message);
+    console.error(error);
+    alert("Fetch error: " + error.message);
     return false;
   }
 
-  const visible = (data || []).filter((p) => {
-    const s = norm(p.status);
-    return s === "available" || s === "reserved";
-  });
+  const visible = (data || []).filter((p) => ["available", "reserved"].includes(n(p.status)));
 
   allPets = visible;
-  salePets = visible.filter((p) => norm(p.section) === "sale");
-  adoptionPets = visible.filter((p) => norm(p.section) === "adoption");
+  salePets = visible.filter((p) => n(p.section) === "sale");
+  adoptionPets = visible.filter((p) => n(p.section) === "adoption");
 
   const explicitFeatured = visible.filter((p) => p.is_featured === true);
   featuredPets = explicitFeatured.length ? explicitFeatured.slice(0, 8) : visible.slice(0, 8);
@@ -94,56 +65,46 @@ async function fetchPets() {
   return true;
 }
 
-// ---------- Filters ----------
-function filterByCategory(list, category) {
-  if (category === "all") return [...list];
-  return list.filter((p) => norm(p.category) === category);
-}
-
 function getSearchTerm() {
-  return norm(document.getElementById("globalSearch")?.value || "");
+  return String(document.getElementById("globalSearch")?.value || "").trim().toLowerCase();
 }
-
 function applySearch(list, term) {
   if (!term) return [...list];
-  return list.filter((p) => norm(p.name).includes(term) || norm(p.category).includes(term));
+  return list.filter((p) => n(p.name).includes(term) || n(p.category).includes(term));
+}
+function applyCategory(list, cat) {
+  if (cat === "all") return [...list];
+  return list.filter((p) => n(p.category) === cat);
 }
 
-// ---------- Rendering ----------
-function petCardTemplate(pet, withBuy = true) {
-  const media = pet.media_url || "https://placehold.co/600x400?text=No+Image";
-  const name = pet.name || "Unnamed pet";
-  const priceText = `${formatPrice(pet.price)}`;
-  const section = norm(pet.section);
-
-  const buyBtn = withBuy
-    ? `<button class="buy-btn" onclick="buyNow('${safeText(name)}','${safeText(priceText)}','${safeText(section)}')">Buy</button>`
-    : "";
+function petCardTemplate(p) {
+  const media = p.media_url || "https://placehold.co/400x300?text=No+Image";
+  const petName = p.name || "";
+  const petPrice = formatPrice(p.price);
+  const section = n(p.section);
 
   return `
-    <article class="pet-card">
+    <div class="pet-card">
       <div class="pet-media-wrap">
         ${
           isVideo(media)
             ? `<video class="pet-image" src="${media}" autoplay muted loop playsinline preload="metadata"></video>`
-            : `<img class="pet-image" src="${media}" alt="${name}" loading="lazy" onerror="this.src='https://placehold.co/600x400?text=Image+Error'">`
+            : `<img class="pet-image" src="${media}" alt="${petName}" loading="lazy" onerror="this.src='https://placehold.co/400x300?text=No+Image'">`
         }
       </div>
-
       <div class="pet-info">
-        <h3 class="pet-name">${name}</h3>
-        <p class="pet-price">${priceText}</p>
-
+        <h3 class="pet-name">${petName}</h3>
+        <p class="pet-price">${petPrice}</p>
         <div class="pet-actions">
-          ${buyBtn}
-          <button class="cart-btn" onclick="addToCart('${safeText(name)}','${safeText(priceText)}')">Add to Cart</button>
+          <button class="buy-btn" onclick="buyNow('${safeText(petName)}','${safeText(petPrice)}','${safeText(section)}')">Buy</button>
+          <button class="cart-btn" onclick="addToCart('${safeText(petName)}','${safeText(petPrice)}')">Add to Cart</button>
         </div>
       </div>
-    </article>
+    </div>
   `;
 }
 
-function renderGrid(containerId, items, emptyId = null, withBuy = true) {
+function renderGrid(containerId, items, emptyId = null) {
   const box = document.getElementById(containerId);
   if (!box) return;
 
@@ -153,7 +114,7 @@ function renderGrid(containerId, items, emptyId = null, withBuy = true) {
     if (emptyId && document.getElementById(emptyId)) {
       document.getElementById(emptyId).style.display = "block";
     } else {
-      box.innerHTML = `<p style="text-align:center;opacity:.7;">No pets found.</p>`;
+      box.innerHTML = "<p>No pets found.</p>";
     }
     return;
   }
@@ -162,29 +123,25 @@ function renderGrid(containerId, items, emptyId = null, withBuy = true) {
     document.getElementById(emptyId).style.display = "none";
   }
 
-  box.innerHTML = items.map((p) => petCardTemplate(p, withBuy)).join("");
+  box.innerHTML = items.map(petCardTemplate).join("");
 }
 
 function renderCurrentView() {
   const term = getSearchTerm();
 
-  // HOME
   const homeList = applySearch(allPets, term).slice(0, visibleCounts.home);
-  renderGrid("home-pets-container", homeList, null, true);
-  renderGrid("featured-pets-container", featuredPets, null, true);
+  renderGrid("home-pets-container", homeList);
+  renderGrid("featured-pets-container", featuredPets);
 
-  // SALE
-  let saleList = filterByCategory(salePets, selectedCategory.sale);
-  saleList = applySearch(saleList, term);
-  renderGrid("sale-pets-container", saleList.slice(0, visibleCounts.sale), "sale-empty", true);
+  let sList = applyCategory(salePets, selectedCategory.sale);
+  sList = applySearch(sList, term).slice(0, visibleCounts.sale);
+  renderGrid("sale-pets-container", sList, "sale-empty");
 
-  // ADOPTION
-  let adoptList = filterByCategory(adoptionPets, selectedCategory.adoption);
-  adoptList = applySearch(adoptList, term);
-  renderGrid("adoption-pets-container", adoptList.slice(0, visibleCounts.adoption), "adoption-empty", true);
+  let aList = applyCategory(adoptionPets, selectedCategory.adoption);
+  aList = applySearch(aList, term).slice(0, visibleCounts.adoption);
+  renderGrid("adoption-pets-container", aList, "adoption-empty");
 }
 
-// ---------- Public actions ----------
 function filterPage(pageType, category, btn) {
   selectedCategory[pageType] = category;
   visibleCounts[pageType] = PAGE_SIZE;
@@ -193,7 +150,6 @@ function filterPage(pageType, category, btn) {
     btn.parentElement.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active-filter"));
     btn.classList.add("active-filter");
   }
-
   renderCurrentView();
 }
 
@@ -209,7 +165,6 @@ function loadMore(pageType) {
   renderCurrentView();
 }
 
-// ---------- Cart + Buy ----------
 function toggleCart() {
   document.getElementById("cart-overlay")?.classList.toggle("active");
 }
@@ -234,7 +189,7 @@ function updateCartUI() {
   list.innerHTML = "";
 
   if (!cart.length) {
-    list.innerHTML = `<p style="text-align:center;opacity:.7;">Your cart is empty.</p>`;
+    list.innerHTML = "<p style='text-align:center;opacity:.7;'>Your cart is empty.</p>";
     totalEl.textContent = "0";
     return;
   }
@@ -260,38 +215,47 @@ function updateCartUI() {
 function buyNow(name, priceText, section) {
   const whatsapp = "13075337422";
   const type = section === "adoption" ? "Adoption Inquiry" : "Purchase Inquiry";
-  const msg =
-    `Hello The Pet Nest,%0A%0A` +
-    `${type}%0A` +
-    `Pet: ${encodeURIComponent(name)}%0A` +
-    `Price: ${encodeURIComponent(priceText)}%0A%0A` +
-    `Please confirm availability.`;
+  const msg = `Hello The Pet Nest!
 
-  window.open(`https://wa.me/${whatsapp}?text=${msg}`, "_blank");
+${type}
+Pet: ${name}
+Price: ${priceText}
+
+Please confirm availability.`;
+  window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
 function checkout() {
-  if (!cart.length) {
-    alert("Cart is empty.");
-    return;
-  }
+  if (!cart.length) return alert("Cart is empty.");
 
   const whatsapp = "13075337422";
   let total = 0;
   let lines = "";
 
-  cart.forEach((c) => {
-    total += c.price;
-    lines += `• ${c.name} - ${c.priceText}\n`;
+  cart.forEach((item) => {
+    total += item.price;
+    lines += `• ${item.name} - ${item.priceText}\n`;
   });
 
-  const message =
-    `Hello The Pet Nest!\n\nI want to order these pets:\n\n${lines}\nTotal: ${total.toLocaleString()}\n\nPlease confirm availability.`;
+  const msg = `Hello The Pet Nest!
 
-  window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(message)}`, "_blank");
+I want to order these pets:
+
+${lines}
+Total: ${total.toLocaleString()}
+
+Please confirm availability.`;
+
+  window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
-// ---------- Init ----------
+window.onscroll = function () {
+  const btn = document.getElementById("homeBtn");
+  if (!btn) return;
+  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) btn.classList.add("visible");
+  else btn.classList.remove("visible");
+};
+
 async function init() {
   const ok = await fetchPets();
   const loading = document.getElementById("home-loading");
@@ -300,7 +264,6 @@ async function init() {
   if (ok) renderCurrentView();
   updateCartUI();
 
-  // periodic refresh
   setInterval(async () => {
     const done = await fetchPets();
     if (done) renderCurrentView();
