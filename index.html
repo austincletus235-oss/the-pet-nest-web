@@ -13,6 +13,12 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+  <!-- OFFLINE WARNING BANNER -->
+  <div id="offline-banner" class="offline-banner">
+    ⚠️ You are offline. Please check your internet connection.
+  </div>
+
   <header>
     <a class="logo" onclick="switchPage('home')">
       <img src="logo.png" class="logo-img" alt="The Pet Nest logo" onerror="this.style.display='none'" />
@@ -173,10 +179,16 @@
     <p>© 2026 The Pet Nest. All rights reserved.</p>
   </footer>
 
-  <!-- FULL SCREEN MEDIA MODAL -->
+  <!-- NEW PROFESSIONAL FULL SCREEN MEDIA & DESCRIPTION MODAL -->
   <div id="media-modal" class="media-modal" onclick="closeMedia()">
-    <span class="close-modal">&times;</span>
-    <div id="media-modal-content" onclick="event.stopPropagation()"></div>
+    <div class="modal-card" onclick="event.stopPropagation()">
+      <button class="close-modal" onclick="closeMedia()">&times;</button>
+      <div id="media-modal-media" class="modal-media-container"></div>
+      <div class="modal-text-container">
+        <h3 id="media-modal-title"></h3>
+        <p id="media-modal-desc"></p>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
