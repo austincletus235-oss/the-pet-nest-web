@@ -40,7 +40,7 @@
     </nav>
   </header>
 
-  <!-- HOME (No pets here, just banners and unclickable categories) -->
+  <!-- HOME -->
   <main id="view-home" class="page-view active">
     <section class="hero">
       <h1>Bring Home a Lifetime of Joy</h1>
@@ -84,7 +84,7 @@
     </section>
   </main>
 
-  <!-- SALE (Pets show up here) -->
+  <!-- SALE -->
   <main id="view-sale" class="page-view">
     <div class="container">
       <div class="fancy-page-header">
@@ -113,7 +113,7 @@
     </div>
   </main>
 
-  <!-- ADOPTION (Pets show up here) -->
+  <!-- ADOPTION -->
   <main id="view-adoption" class="page-view">
     <div class="container">
       <div class="fancy-page-header">
@@ -172,6 +172,12 @@
     <p>Delivering joy, one pet at a time.</p>
     <p>© 2026 The Pet Nest. All rights reserved.</p>
   </footer>
+
+  <!-- FULL SCREEN MEDIA MODAL -->
+  <div id="media-modal" class="media-modal" onclick="closeMedia()">
+    <span class="close-modal">&times;</span>
+    <div id="media-modal-content" onclick="event.stopPropagation()"></div>
+  </div>
 
   <script src="app.js"></script>
 </body>
