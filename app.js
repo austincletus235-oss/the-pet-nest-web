@@ -13,12 +13,11 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// Check Online Status
+// Show live banner if connection drops while viewing
 function updateNetworkStatus() {
   const banner = document.getElementById('offline-banner');
   if (navigator.onLine) {
     banner.classList.remove('active');
-    // Re-fetch pets when coming back online
     fetchPets().then(() => renderCurrentView());
   } else {
     banner.classList.add('active');
@@ -93,7 +92,7 @@ function applyCategory(list, cat) {
   return list.filter((p) => n(p.category) === cat);
 }
 
-// -- NEW PROFESSIONAL MODAL LOGIC --
+// Modal Logic
 function openMedia(url, isVid, title, desc) {
   if (!url || url === "null" || url.includes("placehold.co")) return;
   const modal = document.getElementById("media-modal");
@@ -101,30 +100,22 @@ function openMedia(url, isVid, title, desc) {
   const titleEl = document.getElementById("media-modal-title");
   const descEl = document.getElementById("media-modal-desc");
   
-  // Insert Image or Video properly constrained
   if (isVid) {
     mediaContainer.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
   } else {
     mediaContainer.innerHTML = `<img src="${url}" alt="Pet Image">`;
   }
 
-  // Insert Text
   titleEl.textContent = title || "Pet Details";
   descEl.textContent = desc || "No details provided.";
-
   modal.classList.add("active");
 }
 
 function closeMedia() {
   const modal = document.getElementById("media-modal");
   const mediaContainer = document.getElementById("media-modal-media");
-  
   modal.classList.remove("active");
-  
-  // Clear the media after the fade animation finishes to stop videos from playing in the background
-  setTimeout(() => {
-    mediaContainer.innerHTML = "";
-  }, 300);
+  setTimeout(() => { mediaContainer.innerHTML = ""; }, 300);
 }
 
 
@@ -139,7 +130,6 @@ function petCardTemplate(p) {
   const safeName = safeText(petName);
   const safeDesc = safeText(desc);
 
-  // Add the Read More button logic
   const readMoreHtml = desc.trim() !== "" 
     ? `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">Read more</span>` 
     : `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">View Media</span>`;
@@ -293,11 +283,7 @@ window.onscroll = function () {
 
 async function init() {
   updateNetworkStatus();
-  
-  if (navigator.onLine) {
-    await fetchPets();
-  }
-  
+  if (navigator.onLine) { await fetchPets(); }
   renderCurrentView();
   updateCartUI();
 
