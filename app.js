@@ -1,3 +1,13 @@
+// ====== CACHE CLEAR FIX: Permanently removes the "Viewing offline copy" bar ======
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {
+      registration.unregister();
+    }
+  });
+}
+// ==============================================================================
+
 const SUPABASE_URL = "https://mbpdimmuuzrxgsraofew.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1icGRpbW11dXpyeGdzcmFvZmV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDYwNjAsImV4cCI6MjA5MTk4MjA2MH0.g54oYMrrChSGr_fRpMwFIYp5LAQcV1hzIJqvRXpjj6E";
@@ -13,7 +23,7 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// Check Online Status - Hides Website & Shows Dinosaur Screen
+// Check Online Status - Hides Website & Shows Dinosaur Screen perfectly
 function updateNetworkStatus() {
   const dino = document.getElementById('dino-screen');
   const app = document.getElementById('app-wrapper');
