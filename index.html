@@ -14,7 +14,7 @@
 </head>
 <body>
 
-  <!-- EXACT CHROME DINOSAUR OFFLINE SCREEN (Shows on all pages when offline) -->
+  <!-- FULL SCREEN CHROME DINOSAUR (Shows when network drops) -->
   <div id="dino-screen" class="dino-screen" style="display: none;">
     <div class="dino-container">
       <svg class="dino-icon" viewBox="0 0 24 24" fill="#9aa0a6" width="60" height="60">
@@ -31,7 +31,7 @@
     </div>
   </div>
 
-  <!-- MAIN APP WRAPPER (Hides when offline) -->
+  <!-- MAIN APP WRAPPER -->
   <div id="app-wrapper" class="app-wrapper">
     <header>
       <a class="logo" onclick="switchPage('home')">
@@ -71,22 +71,18 @@
       <section class="category-wrapper">
         <h2>Shop By Categories</h2>
         <div class="visual-categories">
-          <!-- Permanent SVGs instead of Emojis (Will never disappear) -->
+          <!-- COLORFUL EMOJIS RESTORED -->
           <div class="cat-mini-banner bg-all">
-            <svg viewBox="0 0 24 24" class="cat-icon" fill="currentColor"><path d="M4.5 14.5c-1.1 0-2 .9-2 2 0 1.8 1.6 3.5 4 3.5 1.4 0 2.6-.5 3.5-1.2.7.4 1.6.7 2.5.7s1.8-.2 2.5-.7c.9.7 2.1 1.2 3.5 1.2 2.4 0 4-1.7 4-3.5 0-1.1-.9-2-2-2-1.3 0-2.4.8-3.5 1.7-.5.4-1 .8-1.5 1.1-.6-.4-1.3-.6-2-.6s-1.4.2-2 .6c-.5-.3-1-.7-1.5-1.1-1.1-.9-2.2-1.7-3.5-1.7z"/><path d="M7.2 10.8c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm9.6 0c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM10 6.5c-1 0-1.8.9-1.8 2 0 1.2.8 2.1 1.8 2.1s1.8-.9 1.8-2.1c0-1.1-.8-2-1.8-2zm4 0c-1 0-1.8.9-1.8 2 0 1.2.8 2.1 1.8 2.1s1.8-.9 1.8-2.1c0-1.1-.8-2-1.8-2z"/></svg>
-            <span>All Pets</span>
+            <div class="emoji">🐾</div><span>All Pets</span>
           </div>
           <div class="cat-mini-banner bg-dog">
-            <svg viewBox="0 0 24 24" class="cat-icon" fill="currentColor"><path d="M6 10c-1.7 0-3 1.3-3 3v3c0 1.7 1.3 3 3 3h1.2c.5 0 .9-.4.9-.9V20h7.8v1.1c0 .5.4.9.9.9H18c1.7 0 3-1.3 3-3v-3c0-1.7-1.3-3-3-3h-1l-2-3.5c-.3-.9-1.2-1.5-2.1-1.5H11c-1 0-1.8.6-2.1 1.5L7 10H6zm2.5 2.5c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1zm7 0c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1z"/></svg>
-            <span>Dogs</span>
+            <div class="emoji">🐶</div><span>Dogs</span>
           </div>
           <div class="cat-mini-banner bg-cat">
-            <svg viewBox="0 0 24 24" class="cat-icon" fill="currentColor"><path d="M12 4c-2 0-3.7 1-4.8 2.5L4 5v6.5C4 16 7.6 20 12 20s8-4 8-8.5V5l-3.2 1.5C15.7 5 14 4 12 4zm-3 8c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1zm6 0c.6 0 1 .4 1 1s-.4 1-1 1-1-.4-1-1 .4-1 1-1zm-6.2 4.2c.9.8 2 1.3 3.2 1.3s2.3-.5 3.2-1.3c.3-.3.3-.8 0-1.1s-.8-.3-1.1 0c-.6.6-1.3.9-2.1.9s-1.6-.3-2.1-.9c-.3-.3-.8-.3-1.1 0s-.3.8 0 1.1z"/></svg>
-            <span>Cats</span>
+            <div class="emoji">🐱</div><span>Cats</span>
           </div>
           <div class="cat-mini-banner bg-bird">
-            <svg viewBox="0 0 24 24" class="cat-icon" fill="currentColor"><path d="M20 7c-1.6 1.2-3.6 1.8-5.6 1.8h-1.1c.2.4.3.8.3 1.2 0 1.7-1.8 3-4 3-.8 0-1.6-.2-2.2-.5.7 2.6 3.1 5.5 7.9 5.5 3.2 0 5.7-1.6 6.7-3.9-.5.1-1 .2-1.5.2-1 0-1.9-.3-2.6-.8.9-.1 1.8-.4 2.5-.9-.9 0-1.7-.3-2.3-.8.8-.1 1.5-.4 2.1-.9-.7-.1-1.3-.4-1.8-.8.6-.2 1.1-.6 1.6-1.2z"/><circle cx="12" cy="10.5" r="0.8"/></svg>
-            <span>Birds</span>
+            <div class="emoji">🐦</div><span>Birds</span>
           </div>
         </div>
       </section>
@@ -106,7 +102,6 @@
         </div>
       </section>
 
-      <!-- PROFESSIONAL TRUST SECTION -->
       <section class="trust-section">
         <div class="trust-container">
           <h2>Why Choose The Pet Nest?</h2>
@@ -221,7 +216,7 @@
       <p>© 2026 The Pet Nest. All rights reserved.</p>
     </footer>
 
-    <!-- FULL SCREEN MEDIA & DESCRIPTION MODAL -->
+    <!-- MEDIA MODAL -->
     <div id="media-modal" class="media-modal" onclick="closeMedia()">
       <div class="modal-card" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeMedia()">&times;</button>
