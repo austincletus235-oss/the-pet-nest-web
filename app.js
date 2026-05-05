@@ -13,14 +13,18 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// Show live banner if connection drops while viewing
+// Check Online Status - Hides Website & Shows Dinosaur Screen
 function updateNetworkStatus() {
-  const banner = document.getElementById('offline-banner');
+  const dino = document.getElementById('dino-screen');
+  const app = document.getElementById('app-wrapper');
+  
   if (navigator.onLine) {
-    banner.classList.remove('active');
+    dino.style.display = 'none';
+    app.style.display = 'flex';
     fetchPets().then(() => renderCurrentView());
   } else {
-    banner.classList.add('active');
+    app.style.display = 'none';
+    dino.style.display = 'flex';
   }
 }
 window.addEventListener('online', updateNetworkStatus);
@@ -114,10 +118,10 @@ function openMedia(url, isVid, title, desc) {
 function closeMedia() {
   const modal = document.getElementById("media-modal");
   const mediaContainer = document.getElementById("media-modal-media");
+  
   modal.classList.remove("active");
   setTimeout(() => { mediaContainer.innerHTML = ""; }, 300);
 }
-
 
 function petCardTemplate(p) {
   const media = p.media_url || "https://placehold.co/400x300?text=No+Image";
@@ -283,7 +287,11 @@ window.onscroll = function () {
 
 async function init() {
   updateNetworkStatus();
-  if (navigator.onLine) { await fetchPets(); }
+  
+  if (navigator.onLine) {
+    await fetchPets();
+  }
+  
   renderCurrentView();
   updateCartUI();
 
