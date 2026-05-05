@@ -42,14 +42,20 @@ window.addEventListener('offline', updateNetworkStatus);
 
 function n(v) { return String(v || "").toLowerCase().trim(); }
 function safeText(v = "") { return String(v).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
+
 function numericPrice(v) {
   const parsed = parseFloat(String(v ?? "").replace(/[^\d.-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
 }
+
+// ADDS THE DOLLAR SIGN AUTOMATICALLY
 function formatPrice(v) {
-  const num = numericPrice(v);
-  return num ? num.toLocaleString() : String(v ?? "");
+  const str = String(v ?? "").trim();
+  const num = numericPrice(str);
+  // If it's a number, format it with a $ sign. If it's text like "Free", leave it as "Free".
+  return num ? "$" + num.toLocaleString() : str;
 }
+
 function isVideo(url = "") {
   const u = url.toLowerCase();
   return u.includes(".mp4") || u.includes(".webm") || u.includes(".mov") || u.includes(".m4v");
@@ -254,7 +260,7 @@ function updateCartUI() {
 
   if (!cart.length) {
     list.innerHTML = "<p style='text-align:center;opacity:.7;'>Your cart is empty.</p>";
-    totalEl.textContent = "0";
+    totalEl.textContent = "$0";
     return;
   }
 
@@ -269,7 +275,8 @@ function updateCartUI() {
     `;
     list.appendChild(row);
   });
-  totalEl.textContent = total.toLocaleString();
+  // ADDS DOLLAR SIGN TO CART TOTAL
+  totalEl.textContent = "$" + total.toLocaleString();
 }
 
 function buyNow(name, priceText, section) {
@@ -284,7 +291,9 @@ function checkout() {
   const whatsapp = "13075337422";
   let total = 0; let lines = "";
   cart.forEach((item) => { total += item.price; lines += `• ${item.name} - ${item.priceText}\n`; });
-  const msg = `Hello The Pet Nest!\n\nI want to order these pets:\n\n${lines}\nTotal: ${total.toLocaleString()}\n\nPlease confirm availability.`;
+  
+  // ADDS DOLLAR SIGN TO CHECKOUT TOTAL
+  const msg = `Hello The Pet Nest!\n\nI want to order these pets:\n\n${lines}\nTotal: $${total.toLocaleString()}\n\nPlease confirm availability.`;
   window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
