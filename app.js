@@ -20,7 +20,9 @@ function toggleMenu() { document.getElementById("navMenu")?.classList.toggle("ac
 function switchPage(page) {
     currentView = page;
     document.querySelectorAll(".page-view").forEach(el => el.classList.remove("active"));
-    document.getElementById(`view-${page}`)?.classList.add("active");
+    const view = document.getElementById(`view-${page}`);
+    if(view) view.classList.add("active");
+    
     document.getElementById("navMenu")?.classList.remove("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
     
@@ -106,7 +108,9 @@ function handleGlobalSearch() {
     renderGrid("adoption-pets-container", aList, "adoption-empty");
 }
 
-// RESTORED UPLOAD & INSERT FUNCTIONALITY
+// ==========================================
+// ADMIN UPLOAD LOGIC REMAINS INTACT
+// ==========================================
 async function uploadMedia(file) {
     if (!file) return null;
     const ext = file.name.split('.').pop();
@@ -122,8 +126,7 @@ async function uploadMedia(file) {
 async function handleUploadSubmit(e) {
     e.preventDefault();
     const btn = document.getElementById('upload-btn');
-    btn.textContent = "Uploading...";
-    btn.disabled = true;
+    if(btn) { btn.textContent = "Uploading..."; btn.disabled = true; }
 
     const name = document.getElementById('upload-name').value;
     const price = document.getElementById('upload-price').value;
@@ -138,8 +141,7 @@ async function handleUploadSubmit(e) {
         name, price, category, section, description: desc, media_url: mediaUrl, status: 'available'
     }]);
 
-    btn.textContent = "Upload Pet";
-    btn.disabled = false;
+    if(btn) { btn.textContent = "Upload Pet"; btn.disabled = false; }
 
     if (error) {
         alert("Error uploading pet: " + error.message);
@@ -150,28 +152,34 @@ async function handleUploadSubmit(e) {
         renderCurrentView();
     }
 }
+// ==========================================
 
-// Cart & Contact
+// Cart logic
 function toggleCart() { document.getElementById("cart-overlay")?.classList.toggle("active"); }
 function addToCart(name, priceText) { cart.push({ name, priceText, price: numericPrice(priceText) }); updateCartUI(); alert(`Added ${name} to cart!`); }
 function removeFromCart(idx) { cart.splice(idx, 1); updateCartUI(); }
 
 function updateCartUI() {
-    document.getElementById("cart-badge").textContent = cart.length;
+    const badge = document.getElementById("cart-badge");
+    if(badge) badge.textContent = cart.length;
+    
     const list = document.getElementById("cart-items");
     let total = 0;
     
+    if (!list) return;
+
     if (!cart.length) { list.innerHTML = "<p>Cart is empty.</p>"; }
     else {
         list.innerHTML = cart.map((item, i) => {
             total += item.price;
             return `<div class="cart-item">
-                <div><strong>${item.name}</strong><p style="color:var(--accent);">${item.priceText}</p></div>
+                <div><strong>${item.name}</strong><p style="color:var(--accent); margin-top:2px;">${item.priceText}</p></div>
                 <button class="remove-btn" onclick="removeFromCart(${i})">Remove</button>
             </div>`;
         }).join("");
     }
-    document.getElementById("cart-total-price").textContent = "$" + total.toLocaleString();
+    const totalPriceEl = document.getElementById("cart-total-price");
+    if(totalPriceEl) totalPriceEl.textContent = "$" + total.toLocaleString();
 }
 
 function buyNow(name, price, section) {
@@ -186,23 +194,21 @@ function checkout() {
     window.open(`https://wa.me/13075337422?text=${encodeURIComponent(`Hello!\nI want to order:\n${lines}\nTotal: $${total.toLocaleString()}`)}`, "_blank");
 }
 
-function handleContactSubmit(e) {
-    e.preventDefault();
-    alert("Message sent! We'll get back to you soon.");
-    e.target.reset();
-}
-
 // Media Modal
 function openMedia(url, isVid, title, desc) {
     const modal = document.getElementById("media-modal");
+    if(!modal) return;
     document.getElementById("media-modal-media").innerHTML = isVid ? `<video src="${url}" controls autoplay></video>` : `<img src="${url}">`;
     document.getElementById("media-modal-title").textContent = title;
     document.getElementById("media-modal-desc").textContent = desc;
     modal.classList.add("active");
 }
 function closeMedia() { 
-    document.getElementById("media-modal").classList.remove("active"); 
-    setTimeout(() => document.getElementById("media-modal-media").innerHTML = "", 300);
+    const modal = document.getElementById("media-modal");
+    if(modal) {
+        modal.classList.remove("active"); 
+        setTimeout(() => document.getElementById("media-modal-media").innerHTML = "", 300);
+    }
 }
 
 window.onscroll = function () {
