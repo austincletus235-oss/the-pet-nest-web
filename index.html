@@ -12,9 +12,9 @@
 </head>
 <body>
     <div id="app-wrapper" class="app-wrapper">
-        <header>
+        <header class="main-header">
             <a class="logo" onclick="switchPage('home')">
-                <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80" alt="Logo" class="logo-img">
+                <img src="logo.png" alt="Logo" class="logo-img" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=100&q=80'">
                 <span>The Pet Nest</span>
             </a>
             <div class="header-controls">
@@ -28,37 +28,42 @@
                 <button class="hamburger" onclick="toggleMenu()">☰</button>
             </div>
             <nav class="nav-links" id="navMenu">
-                <a onclick="switchPage('home')">Home</a>
-                <a onclick="switchPage('sale')">Buy a Pet</a>
-                <a onclick="switchPage('adoption')">Adopt a Pet</a>
-                <a onclick="switchPage('list-pet')" style="color: var(--accent); font-weight: 600;">List a Pet</a>
+                <a onclick="switchPage('home')">🏠 Home</a>
+                <a onclick="switchPage('sale')">🐕 Buy a Pet</a>
+                <a onclick="switchPage('adoption')">🏡 Adopt a Pet</a>
             </nav>
         </header>
 
         <main id="view-home" class="page-view active">
+            
             <section class="hero">
                 <div class="hero-overlay"></div>
                 <div class="hero-content">
                     <h1>Find & Adopt Pets Near You</h1>
                     <p>The Pet Nest connects loving homes with pets in need. Discover your perfect family member today.</p>
-                    <div class="hero-buttons">
-                        <button class="cta-primary" onclick="switchPage('adoption')">Adopt a Pet</button>
-                        <button class="cta-secondary" onclick="switchPage('list-pet')">List a Pet</button>
-                        <button class="cta-outline" onclick="document.getElementById('contact-section').scrollIntoView({behavior: 'smooth'})">Get in Touch</button>
-                    </div>
                 </div>
             </section>
 
-            <section class="about-section container">
-                <div class="about-content">
-                    <h2>What is The Pet Nest?</h2>
-                    <p>We are a dedicated platform bridging the gap between premium, ethically raised companions and loving homes. Whether you are looking to adopt a rescue in need or purchase a specific breed, we ensure a safe, transparent, and joyful experience.</p>
-                    <br>
-                    <h3>Why Trust Us?</h3>
-                    <div class="trust-features">
-                        <span>✔️ 100% Health Guarantee</span>
-                        <span>✔️ Vet Checked</span>
-                        <span>✔️ Loving Environments</span>
+            <section class="category-wrapper container">
+                <h2>Shop By Categories</h2>
+                <div class="visual-categories">
+                    <div class="category-item">
+                        <div class="cat-img-wrap">
+                            <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Dogs">
+                        </div>
+                        <span>Dogs</span>
+                    </div>
+                    <div class="category-item">
+                        <div class="cat-img-wrap">
+                            <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Cats">
+                        </div>
+                        <span>Cats</span>
+                    </div>
+                    <div class="category-item">
+                        <div class="cat-img-wrap">
+                            <img src="https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&auto=format&fit=crop&w=300&q=80" alt="Birds">
+                        </div>
+                        <span>Birds</span>
                     </div>
                 </div>
             </section>
@@ -66,54 +71,59 @@
             <section class="services-section container">
                 <h2>Our Services</h2>
                 <div class="services-grid">
-                    <div class="service-card" onclick="switchPage('adoption')">
+                    <div class="service-card banner-style">
                         <div class="service-icon">🏡</div>
                         <h3>Pet Adoption</h3>
                         <p>Give a loving forever home to a rescue pet in need.</p>
                     </div>
-                    <div class="service-card" onclick="switchPage('sale')">
+                    <div class="service-card banner-style">
                         <div class="service-icon">🐕</div>
                         <h3>Pet Sales</h3>
                         <p>Find healthy, well-raised specific breeds from trusted sources.</p>
                     </div>
-                    <div class="service-card" onclick="switchPage('list-pet')">
-                        <div class="service-icon">📝</div>
-                        <h3>List Your Pet</h3>
-                        <p>Need to rehome a pet? List them safely on our platform.</p>
+                    <div class="service-card banner-style">
+                        <div class="service-icon">🛡️</div>
+                        <h3>Secure Process</h3>
+                        <p>Safe, transparent, and verified placements for all animals.</p>
                     </div>
                 </div>
             </section>
 
-            <section class="category-wrapper container">
-                <h2>Browse By Categories</h2>
-                <div class="visual-categories">
-                    <div class="cat-mini-banner bg-dog" onclick="switchPage('sale')">
-                        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Dogs">
-                        <span>Dogs</span>
+            <section class="about-section">
+                <div class="container">
+                    <div class="about-content">
+                        <h2>What is The Pet Nest?</h2>
+                        <p>The Pet Nest is a premier network committed to uniting ethically raised and rescued pets with caring, responsible families. We prioritize the well-being of every animal, ensuring a transparent, secure, and highly supportive experience for all our patrons. Whether you are seeking to adopt a rescue or acquire a specific breed, we provide a trusted environment for your journey.</p>
+                        <br>
+                        <h3>Why Trust Us?</h3>
+                        <div class="trust-features">
+                            <span>✔️ 100% Health Guarantee</span>
+                            <span>✔️ Vet Checked & Verified</span>
+                            <span>✔️ Loving Environments</span>
+                            <span>✔️ Dedicated Support</span>
+                        </div>
                     </div>
-                    <div class="cat-mini-banner bg-cat" onclick="switchPage('sale')">
-                        <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Cats">
-                        <span>Cats</span>
-                    </div>
-                    <div class="cat-mini-banner bg-bird" onclick="switchPage('sale')">
-                        <img src="https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" alt="Birds">
-                        <span>Birds</span>
-                    </div>
+                </div>
+            </section>
+
+            <section class="animal-gallery container">
+                <h2>Our Happy Pets</h2>
+                <div class="gallery-grid">
+                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Happy Dog">
+                    <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Happy Cat">
+                    <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Golden Retriever">
+                    <img src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?ixlib=rb-4.0.3&auto=format&fit=crop&w=400&q=80" alt="Kitten">
                 </div>
             </section>
 
             <section id="contact-section" class="contact-section container">
                 <div class="contact-card">
-                    <h2>Get in Touch</h2>
-                    <p>Have questions? We'd love to hear from you.</p>
-                    <form class="contact-form" onsubmit="handleContactSubmit(event)">
-                        <input type="text" id="contactName" placeholder="Your Name" required>
-                        <input type="email" id="contactEmail" placeholder="Your Email" required>
-                        <textarea id="contactMessage" rows="4" placeholder="How can we help you?" required></textarea>
-                        <button type="submit" class="cta-primary" style="width: 100%;">Send Message</button>
-                    </form>
-                    <div class="contact-links">
-                        <a target="_blank" href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest!%20I%20need%20help." class="wa-text-link">📱 Chat on WhatsApp</a>
+                    <h2>Customer Service</h2>
+                    <p>Have questions or need assistance with a pet? Our support team is here to help you every step of the way.</p>
+                    <div class="contact-links" style="margin-top: 20px;">
+                        <a target="_blank" href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest!%20I%20need%20help." class="wa-large-btn">
+                            💬 Chat with us on WhatsApp
+                        </a>
                     </div>
                 </div>
             </section>
@@ -122,7 +132,7 @@
         <main id="view-sale" class="page-view">
             <div class="container">
                 <div class="fancy-page-header">
-                    <h2>Pets for Sale</h2>
+                    <h2>Pets for Sale 🐕</h2>
                     <p>Choose your perfect companion.</p>
                 </div>
                 <div class="page-filters">
@@ -144,7 +154,7 @@
         <main id="view-adoption" class="page-view">
             <div class="container">
                 <div class="fancy-page-header">
-                    <h2>Pets for Adoption</h2>
+                    <h2>Pets for Adoption 🏡</h2>
                     <p>Give a loving home to a pet in need.</p>
                 </div>
                 <div class="page-filters">
@@ -160,56 +170,6 @@
                     <p>Please check back soon.</p>
                 </div>
                 <div id="adoption-pets-container" class="pet-grid"></div>
-            </div>
-        </main>
-
-        <main id="view-list-pet" class="page-view">
-            <div class="container">
-                <div class="fancy-page-header">
-                    <h2>List a Pet</h2>
-                    <p>Add a new pet to the database.</p>
-                </div>
-                <div class="form-container">
-                    <form id="upload-form" onsubmit="handleUploadSubmit(event)">
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Pet Name *</label>
-                                <input type="text" id="upload-name" placeholder="e.g. Bella" required>
-                            </div>
-                            <div class="form-group">
-                                <label>Price</label>
-                                <input type="text" id="upload-price" placeholder="e.g. 1200 or Free">
-                            </div>
-                        </div>
-                        <div class="form-row">
-                            <div class="form-group">
-                                <label>Category</label>
-                                <select id="upload-category">
-                                    <option value="dog">Dog</option>
-                                    <option value="cat">Cat</option>
-                                    <option value="bird">Bird</option>
-                                    <option value="other">Other</option>
-                                </select>
-                            </div>
-                            <div class="form-group">
-                                <label>Section</label>
-                                <select id="upload-section">
-                                    <option value="sale">For Sale</option>
-                                    <option value="adoption">Adoption</option>
-                                </select>
-                            </div>
-                        </div>
-                        <div class="form-group">
-                            <label>Image/Video *</label>
-                            <input type="file" id="upload-media" accept="image/*,video/*" required>
-                        </div>
-                        <div class="form-group">
-                            <label>Description</label>
-                            <textarea id="upload-desc" rows="4" placeholder="Short description..."></textarea>
-                        </div>
-                        <button type="submit" id="upload-btn" class="cta-primary" style="width: 100%;">Upload Pet</button>
-                    </form>
-                </div>
             </div>
         </main>
 
@@ -232,7 +192,6 @@
 
         <div class="floating-container">
             <a id="homeBtn" class="float-btn home-btn" onclick="window.scrollTo(0,0)">↑</a>
-            <a class="float-btn wa-btn" target="_blank" href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest!%20I%20need%20help.">💬 Chat</a>
         </div>
         <footer>
             <h3>The Pet Nest</h3>
