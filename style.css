@@ -41,32 +41,40 @@ body { background: var(--bg); color: var(--text); display: flex; flex-direction:
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
 .container { max-width: 1200px; margin: 0 auto; padding: 0 5%; width: 100%; }
 
-/* HERO */
-.hero { position: relative; background: url("https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80") center/cover no-repeat; min-height: 40vh; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; }
-.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 60, 90, 0.6); }
-.hero-content { position: relative; z-index: 1; padding: 20px; max-width: 800px; }
+/* HERO (Height increased to fit categories inside) */
+.hero { position: relative; background: url("https://images.unsplash.com/photo-1450778869180-41d0601e046e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80") center/cover no-repeat; min-height: 60vh; display: flex; align-items: center; justify-content: center; text-align: center; color: #fff; padding: 40px 0; }
+.hero-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background: rgba(30, 60, 90, 0.65); }
+.hero-content { position: relative; z-index: 1; padding: 20px; width: 100%; max-width: 900px; }
 .hero h1 { font-size: clamp(1.8rem, 5vw, 3rem); font-weight: 700; margin-bottom: 10px; line-height: 1.2; text-shadow: 0 2px 5px rgba(0,0,0,0.5); }
-.hero p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.95; font-weight: 400; text-shadow: 0 1px 3px rgba(0,0,0,0.5); }
+.hero p { font-size: clamp(0.9rem, 2vw, 1.1rem); opacity: 0.95; font-weight: 400; text-shadow: 0 1px 3px rgba(0,0,0,0.5); margin-bottom: 10px; }
 
-/* CATEGORIES (Smaller & Straight Line) */
-.category-wrapper { text-align: center; padding: 30px 5%; margin-top: 10px; }
-.category-wrapper h2 { margin-bottom: 20px; font-size: clamp(1.4rem, 4vw, 2rem); color: var(--primary); }
+/* CATEGORIES (Now sitting inside the Hero) */
+.category-wrapper { text-align: center; margin-top: 35px; padding: 0; }
+.category-wrapper h2 { margin-bottom: 15px; font-size: clamp(1.2rem, 3vw, 1.6rem); color: #fff; text-shadow: 0 2px 4px rgba(0,0,0,0.5); }
 .visual-categories { display: flex; justify-content: center; gap: 20px; flex-wrap: nowrap; max-width: 100%; margin: 0 auto; overflow-x: auto; padding-bottom: 10px; }
 .category-item { display: flex; flex-direction: column; align-items: center; gap: 8px; flex: 0 0 auto; }
-.cat-img-wrap { width: 100px; height: 100px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.1); border: 2px solid #fff; }
+.cat-img-wrap { width: 90px; height: 90px; border-radius: 50%; overflow: hidden; box-shadow: 0 4px 10px rgba(0,0,0,0.3); border: 2px solid #fff; }
 .cat-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
-.category-item span { font-weight: 600; font-size: 1rem; color: var(--primary); }
+.category-item span { font-weight: 600; font-size: 0.95rem; color: #fff; text-shadow: 0 1px 3px rgba(0,0,0,0.8); } /* Changed to white to be readable over hero image */
 
-/* SERVICES (Colored Banners & Smaller) */
-.services-section { padding: 10px 5% 30px; text-align: center; }
-.services-section h2 { color: var(--primary); margin-bottom: 15px; font-size: clamp(1.4rem, 4vw, 2rem); }
-.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
-.banner-style { background: linear-gradient(135deg, rgba(30, 60, 90, 0.05), rgba(244, 162, 97, 0.1)); padding: 15px; border-radius: 12px; border: 1px solid #eaeaea; border-bottom: 4px solid var(--secondary); box-shadow: 0 4px 10px rgba(0,0,0,0.03); }
-.service-icon { font-size: 2rem; margin-bottom: 8px; }
-.banner-style h3 { color: var(--primary); margin-bottom: 5px; font-size: 1.05rem; }
-.banner-style p { color: #555; font-size: 0.85rem; line-height: 1.4; }
+/* SERVICES (Now with Beautiful Distinct Colors) */
+.services-section { padding: 40px 5% 30px; text-align: center; }
+.services-title { color: var(--primary); margin-bottom: 25px; font-size: clamp(1.4rem, 4vw, 2rem); }
+.services-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; }
 
-/* ABOUT (Professional) */
+/* Distinct Colors for each banner */
+.banner-style { padding: 20px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.06); transition: transform 0.3s; }
+.banner-style:hover { transform: translateY(-5px); }
+
+.banner-adopt { background: linear-gradient(135deg, #e3f2fd, #bbdefb); border-bottom: 4px solid #2196f3; }
+.banner-buy { background: linear-gradient(135deg, #fff3e0, #ffe0b2); border-bottom: 4px solid #ff9800; }
+.banner-secure { background: linear-gradient(135deg, #e8f5e9, #c8e6c9); border-bottom: 4px solid #4caf50; }
+
+.service-icon { font-size: 2.2rem; margin-bottom: 10px; }
+.banner-style h3 { color: #1e3c5a; margin-bottom: 8px; font-size: 1.15rem; font-weight: 700; }
+.banner-style p { color: #444; font-size: 0.9rem; line-height: 1.5; }
+
+/* ABOUT */
 .about-section { background: #eef5fc; padding: 40px 0; margin-top: 20px; border-top: 1px solid #d9e6f2; border-bottom: 1px solid #d9e6f2; text-align: center; }
 .about-content { max-width: 800px; margin: 0 auto; background: #fff; padding: 30px; border-radius: 12px; box-shadow: 0 6px 20px rgba(30,60,90,0.06); }
 .about-content h2 { color: var(--primary); margin-bottom: 15px; font-size: clamp(1.4rem, 4vw, 2rem); }
@@ -150,7 +158,7 @@ footer p { opacity:.8; font-size:0.8rem; }
 
 /* SMALL SCREENS */
 @media (max-width: 600px) {
-    .cat-img-wrap { width: 80px; height: 80px; } /* Even smaller on mobile to fit in a straight line */
+    .cat-img-wrap { width: 80px; height: 80px; }
     .visual-categories { gap: 10px; }
     .category-item span { font-size: 0.85rem; }
     .about-section { padding: 30px 0; }
