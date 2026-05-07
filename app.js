@@ -26,7 +26,7 @@ function switchPage(page) {
     document.getElementById("navMenu")?.classList.remove("active");
     window.scrollTo({ top: 0, behavior: "smooth" });
     
-    if (page !== "home" && document.getElementById("globalSearch")) {
+    if (page !== "home" && page !== "contact" && document.getElementById("globalSearch")) {
         document.getElementById("globalSearch").value = "";
     }
     renderCurrentView();
@@ -108,9 +108,6 @@ function handleGlobalSearch() {
     renderGrid("adoption-pets-container", aList, "adoption-empty");
 }
 
-// ==========================================
-// ADMIN UPLOAD LOGIC REMAINS INTACT
-// ==========================================
 async function uploadMedia(file) {
     if (!file) return null;
     const ext = file.name.split('.').pop();
@@ -152,7 +149,6 @@ async function handleUploadSubmit(e) {
         renderCurrentView();
     }
 }
-// ==========================================
 
 // Cart logic
 function toggleCart() { document.getElementById("cart-overlay")?.classList.toggle("active"); }
