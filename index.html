@@ -1,351 +1,261 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Pet Nest | Premium Pet Adoption & Sales</title>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Pet Nest | Premium Companions</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-    <div id="app-wrapper" class="app-wrapper">
-        <header class="main-header">
-            <a class="logo" onclick="switchPage('home')">
-                <img src="logo.png" alt="Logo" class="logo-img" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'">
-                <span>The Pet Nest</span>
-            </a>
-            
-            <nav class="nav-links" id="navMenu">
-                <a onclick="switchPage('home')">🏠 Home</a>
-                <a onclick="switchPage('sale')">🐕 Buy a Pet</a>
-                <a onclick="switchPage('adoption')">🏡 Adopt a Pet</a>
-                <a onclick="switchPage('contact')">📞 Contact Us</a>
-            </nav>
 
-            <div class="header-controls">
-                <div class="search-bar">
-                    <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" />
-                    <button onclick="handleGlobalSearch()" class="search-btn">🔍</button>
-                </div>
-                <div class="cart-icon" onclick="toggleCart()">
-                    🛒 Cart <span class="cart-count" id="cart-badge">0</span>
-                </div>
-                <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
-            </div>
-        </header>
+  <div id="dino-screen" class="dino-screen" style="display: none;">
+    <div class="dino-container">
+      <svg class="dino-icon" viewBox="0 0 24 24" fill="#9aa0a6" width="60" height="60">
+        <path d="M20 0h-8v4H8V2H6v2H4v6h2v2h2v2h2v6H8v2h2v2h2v-4h2v2h2v-2h-2v-2h4v-2h2v-2h2V0h-4zm0 8h-2v2h-2V8h-2V6h2V4h2v4h2v-4h2v8h-2v-2z"/>
+      </svg>
+      <h2>No internet</h2>
+      <p>Try:</p>
+      <ul>
+        <li>Turning off airplane mode</li>
+        <li>Turning on mobile data or Wi-Fi</li>
+        <li>Checking the signal in your area</li>
+      </ul>
+      <p class="dino-err">ERR_INTERNET_DISCONNECTED</p>
+    </div>
+  </div>
 
-        <main id="view-home" class="page-view active">
-            <section class="hero">
-                <div class="hero-overlay"></div>
-                <div class="hero-content">
-                    <h1>Find & Adopt Pets Near You</h1>
-                    <p>Connecting loving homes with verified, healthy companions.</p>
-                    
-                    <div class="category-wrapper">
-                        <h2>Shop By Categories</h2>
-                        <div class="visual-categories">
-                            <div class="category-item">
-                                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=200&q=80" alt="Dogs"></div>
-                                <span>Dogs</span>
-                            </div>
-                            <div class="category-item">
-                                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=200&q=80" alt="Cats"></div>
-                                <span>Cats</span>
-                            </div>
-                            <div class="category-item">
-                                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=200&q=80" alt="Birds"></div>
-                                <span>Birds</span>
-                            </div>
-                            <div class="category-item">
-                                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=200&q=80" alt="Others"></div>
-                                <span>Others</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </section>
+  <div id="app-wrapper" class="app-wrapper">
+    <header>
+      <a class="logo" onclick="switchPage('home')">
+        <img src="logo.png" class="logo-img" alt="The Pet Nest logo" onerror="this.style.display='none'" />
+        <span>The Pet Nest</span>
+      </a>
 
-            <section class="trust-bar">
-                <div class="container trust-flex">
-                    <span>🛡️ Verified Breeders</span>
-                    <span>🏥 Vet-Checked Guarantee</span>
-                    <span>🚚 Secure Delivery</span>
-                    <span>💬 24/7 Support</span>
-                </div>
-            </section>
+      <div class="header-controls">
+        <div class="search-bar">
+          <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" onkeypress="if(event.key === 'Enter') handleGlobalSearch()" />
+          <button onclick="handleGlobalSearch()" class="search-btn">🔍</button>
+        </div>
+        <div class="cart-icon" onclick="toggleFav()">
+          ❤️ Fav
+          <span class="cart-count" id="fav-badge">0</span>
+        </div>
+        <div class="cart-icon" onclick="toggleCart()">
+          🛒 Cart
+          <span class="cart-count" id="cart-badge">0</span>
+        </div>
+        <button class="hamburger" onclick="toggleMenu()">☰</button>
+      </div>
 
-            <section class="services-section container">
-                <h2 class="section-title">Our Premium Services</h2>
-                <div class="services-grid">
-                    <div class="service-card banner-adopt">
-                        <div class="service-icon">🏡</div>
-                        <h3>Ethical Adoption</h3>
-                        <p>Giving rescue pets a second chance at a happy life.</p>
-                    </div>
-                    <div class="service-card banner-buy">
-                        <div class="service-icon">🐕</div>
-                        <h3>Verified Sales</h3>
-                        <p>Direct connections to responsible and healthy pedigrees.</p>
-                    </div>
-                    <div class="service-card banner-secure">
-                        <div class="service-icon">🛡️</div>
-                        <h3>Safety First</h3>
-                        <p>Every transaction is protected and every pet is tracked.</p>
-                    </div>
-                </div>
-            </section>
+      <nav class="nav-links" id="navMenu">
+        <a onclick="switchPage('home')">Home</a>
+        <a onclick="switchPage('sale')">Pets for Sale</a>
+        <a onclick="switchPage('adoption')">Pets for Adoption</a>
+      </nav>
+    </header>
 
-            <section class="knowledge-base container">
-                <h2 class="section-title">Pet Care Essentials</h2>
-                <div class="kb-grid">
-                    <div class="kb-card">
-                        <img src="https://images.unsplash.com/photo-1516734212186-a967f81ad0d7?auto=format&fit=crop&w=400&q=80" alt="Care">
-                        <div class="kb-info">
-                            <h4>The First 48 Hours</h4>
-                            <p>How to help your new pet adjust to their home environment seamlessly.</p>
-                        </div>
-                    </div>
-                    <div class="kb-card">
-                        <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=400&q=80" alt="Nutrition">
-                        <div class="kb-info">
-                            <h4>Nutrition Guide</h4>
-                            <p>The best diet practices to ensure your new puppy or kitten grows healthy and strong.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="testimonial-section">
-                <h2 class="section-title" style="color: white;">What Our Families Say</h2>
-                <div class="marquee-container">
-                    <div class="marquee-content">
-                        <div class="t-card">"Found my best friend here! Highly recommend." - Sarah L.</div>
-                        <div class="t-card">"The healthiest Golden Retriever we could ask for." - Mark T.</div>
-                        <div class="t-card">"Professional, caring, and so transparent." - Emily R.</div>
-                        <div class="t-card">"WhatsApp support answered all my anxious questions!" - David K.</div>
-                        <div class="t-card">"Our rescue cat settled in perfectly on day one." - Jessica M.</div>
-                        <div class="t-card">"Secure payment made me feel totally safe." - Brian C.</div>
-                        <div class="t-card">"They truly care about where these animals go." - Olivia H.</div>
-                        <div class="t-card">"The delivery was smooth and on time." - James P.</div>
-                        <div class="t-card">"Loved the variety of birds they had available." - Anita S.</div>
-                        <div class="t-card">"Vet records were provided immediately. Top notch." - Tom W.</div>
-                        <div class="t-card">"Such a beautiful platform, very easy to use." - Rachel V.</div>
-                        <div class="t-card">"Our kids are overjoyed with our new puppy!" - The Smith Family</div>
-                        <div class="t-card">"10/10 experience from browsing to adoption." - Liam D.</div>
-                        <div class="t-card">"The pet matcher helped us find the perfect indoor cat." - Chloe F.</div>
-                        <div class="t-card">"I was skeptical of buying online, but they proved me wrong." - Ethan G.</div>
-                        <div class="t-card">"Customer service is truly 24/7. So helpful." - Maria N.</div>
-                        <div class="t-card">"A fantastic initiative for ethical pet sales." - Dr. Allen (Vet)</div>
-                        <div class="t-card">"Our parrot arrived safe, sound, and very chatty!" - Nina B.</div>
-                        <div class="t-card">"The Pet Nest is the only site I trust now." - Gary L.</div>
-                        <div class="t-card">"No hidden fees, very straightforward process." - Sophia Z.</div>
-                        <div class="t-card">"Our German Shepherd is stunning and so smart." - Victor O.</div>
-                        <div class="t-card">"I appreciated the background checks they do." - Lisa Q.</div>
-                        <div class="t-card">"Best decision I ever made was adopting through them." - Paul J.</div>
-                        <div class="t-card">"Every pet looks so well taken care of." - Angela W.</div>
-                        <div class="t-card">"They guided us on pet nutrition right away." - Kevin H.</div>
-                        <div class="t-card">"Seamless interface, found what I needed in minutes." - Tara C.</div>
-                        <div class="t-card">"The health guarantee gave me peace of mind." - Daniel M.</div>
-                        <div class="t-card">"My Siamese kitten is an absolute dream." - Clara T.</div>
-                        <div class="t-card">"Five stars for the delivery team taking such good care." - Ryan B.</div>
-                        <div class="t-card">"They follow up even after you've brought the pet home!" - Fiona E.</div>
-                        <div class="t-card">"It feels great to support an ethical business." - Matthew Y.</div>
-                        <div class="t-card">"The detailed pet descriptions were spot on." - Grace I.</div>
-                        <div class="t-card">"Our rescue mix is the sweetest dog ever." - Noah A.</div>
-                        <div class="t-card">"Such a professional and loving team behind this." - Isabella P.</div>
-                        <div class="t-card">"I couldn't believe how easy the paperwork was." - Leo R.</div>
-                        <div class="t-card">"We will definitely be coming back for a second pet." - The Joneses</div>
-                        <div class="t-card">"Everything is so well organized on the site." - Sam K.</div>
-                        <div class="t-card">"A wonderful community for pet lovers." - Julia D.</div>
-                        <div class="t-card">"The customer reps are actual pet experts!" - Henry S.</div>
-                        <div class="t-card">"Got my dream French Bulldog safely." - Mia W.</div>
-                        <div class="t-card">"They ensure the pets go to good homes." - Oscar F.</div>
-                        <div class="t-card">"Very quick response time on WhatsApp." - Lily G.</div>
-                        <div class="t-card">"Absolutely zero regrets. Best site out there." - Jack H.</div>
-                        <div class="t-card">"The knowledge base articles really helped us prepare." - Ruby C.</div>
-                        <div class="t-card">"Healthy, happy pets and honest people." - Arthur M.</div>
-                        <div class="t-card">"I love the strict verification for breeders." - Evelyn L.</div>
-                        <div class="t-card">"They made sure we had all the right supplies first." - George P.</div>
-                        <div class="t-card">"Such a joyful experience adopting our cat." - Hazel V.</div>
-                        <div class="t-card">"No scams here, just real, lovely animals." - Thomas E.</div>
-                        <div class="t-card">"The UI is gorgeous and simple to navigate." - Freya T.</div>
-                        <div class="t-card">"We've had our pup for a month, no health issues!" - Charlie D.</div>
-                        <div class="t-card">"The best pet service I've ever used in my life." - Alice W.</div>
-                        <div class="t-card">"Can't thank The Pet Nest enough for our boy." - Harry K.</div>
-                        <div class="t-card">"They genuinely love animals, you can tell." - Florence J.</div>
-                        <div class="t-card">"Secure and fast checkout process." - William S.</div>
-                        <div class="t-card">"Our Maine Coon cat is spectacular." - Ivy M.</div>
-                        <div class="t-card">"A beautiful project with a great mission." - Edward B.</div>
-                        <div class="t-card">"It’s rare to find customer service this good." - Daisy N.</div>
-                        <div class="t-card">"Highly recommend to anyone looking for a pet." - Lucas H.</div>
-                        <div class="t-card">"The vet-checked guarantee is the real deal." - Poppy R.</div>
-                        <div class="t-card">"Our family feels whole now. Thank you!" - The Clarkes</div>
-                        <div class="t-card">"Clear communication from start to finish." - Theo F.</div>
-                        <div class="t-card">"They matched us with the perfect beginner bird." - Sienna L.</div>
-                        <div class="t-card">"Even my vet was impressed by their paperwork." - Max P.</div>
-                        <div class="t-card">"It’s so much better than going to a pet store." - Rosie C.</div>
-                        <div class="t-card">"Super reliable and trustworthy platform." - Alexander Y.</div>
-                        <div class="t-card">"The happy pets gallery says it all!" - Matilda W.</div>
-                        <div class="t-card">"I recommend them to all my friends now." - Harrison T.</div>
-                        <div class="t-card">"Very responsible adoption process." - Elsie G.</div>
-                        <div class="t-card">"Our Beagle arrived right to our door." - Oliver D.</div>
-                        <div class="t-card">"Fantastic selection of healthy animals." - Maya S.</div>
-                        <div class="t-card">"We found our soul-dog on this site." - Louis H.</div>
-                        <div class="t-card">"They answered my texts at 10 PM. Amazing." - Erin M.</div>
-                        <div class="t-card">"Honesty and integrity in every step." - Toby K.</div>
-                        <div class="t-card">"My daughter is in love with her new kitten." - Gemma B.</div>
-                        <div class="t-card">"I felt supported through the whole adoption." - Hugo C.</div>
-                        <div class="t-card">"Great filtering options to find exactly what I wanted." - Zara F.</div>
-                        <div class="t-card">"They handle everything with so much care." - Jasper V.</div>
-                        <div class="t-card">"A premium service for premium pets." - Mila R.</div>
-                        <div class="t-card">"The easiest way to safely buy a pet online." - Sebastian N.</div>
-                        <div class="t-card">"A wonderful group of dedicated pet advocates." - Layla P.</div>
-                        <div class="t-card">"They even checked in a week later!" - Jude L.</div>
-                        <div class="t-card">"High quality site, high quality service." - Eva W.</div>
-                        <div class="t-card">"My Poodle is exactly as described and so sweet." - Jaxon E.</div>
-                        <div class="t-card">"They made a daunting process feel so easy." - Aria T.</div>
-                        <div class="t-card">"Trustworthy, ethical, and fast." - Rory G.</div>
-                        <div class="t-card">"Our rescue is a perfect fit for our lifestyle." - Scarlett J.</div>
-                        <div class="t-card">"I would give 10 stars if I could." - Felix D.</div>
-                        <div class="t-card">"The best place to find your next best friend." - Penelope M.</div>
-                        <div class="t-card">"Such a clean and modern website layout." - Ezra B.</div>
-                        <div class="t-card">"The peace of mind they offer is priceless." - Harper S.</div>
-                        <div class="t-card">"Our vet confirmed the pet was in perfect health." - Asher C.</div>
-                        <div class="t-card">"A brilliant service that really cares." - Stella H.</div>
-                        <div class="t-card">"Found a rare breed with zero hassle." - Finn Q.</div>
-                        <div class="t-card">"The WhatsApp button makes everything simple." - Willow Z.</div>
-                        <div class="t-card">"We love our new puppy! Thank you Pet Nest!" - Carter Y.</div>
-                        <div class="t-card">"Highly professional from the very first click." - Aurora K.</div>
-                        <div class="t-card">"This site is doing God's work for these animals." - Elias V.</div>
-                        <div class="t-card">"So much better than any other site I've tried." - Luna X.</div>
-                        <div class="t-card">"They brought so much joy to our home." - The Miller Family</div>
-                    </div>
-                </div>
-            </section>
-
-            <section class="animal-gallery container">
-                <h2 class="section-title">Our Happy Pets</h2>
-                <div class="gallery-grid">
-                    <div class="media-container">
-                        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=400&q=80" alt="Dog" onclick="openMediaModal(this.src, false, 'A happy golden retriever finding its forever home!')">
-                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
-                    </div>
-                    <div class="media-container">
-                        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=400&q=80" alt="Cat" onclick="openMediaModal(this.src, false, 'A playful kitten exploring the living room.')">
-                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
-                    </div>
-                    <div class="media-container">
-                        <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80" alt="Dog" onclick="openMediaModal(this.src, false, 'Energetic husky ready for a walk.')">
-                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
-                    </div>
-                    <div class="media-container">
-                        <img src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=400&q=80" alt="Kitten" onclick="openMediaModal(this.src, false, 'Sleepy rescue kitten napping.')">
-                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <main id="view-sale" class="page-view">
-            <div class="container">
-                <div class="fancy-page-header"><h2 class="section-title">Pets for Sale 🐕</h2></div>
-                <div class="page-filters">
-                    <button class="filter-btn active-filter" onclick="filterPage('sale','all',this)">All</button>
-                    <button class="filter-btn" onclick="filterPage('sale','dog',this)">Dogs</button>
-                    <button class="filter-btn" onclick="filterPage('sale','cat',this)">Cats</button>
-                </div>
-                <div id="sale-pets-container" class="pet-grid"></div>
-            </div>
-        </main>
-
-        <main id="view-adoption" class="page-view">
-            <div class="container">
-                <div class="fancy-page-header"><h2 class="section-title">Pets for Adoption 🏡</h2></div>
-                <div class="page-filters">
-                    <button class="filter-btn active-filter" onclick="filterPage('adoption','all',this)">All</button>
-                    <button class="filter-btn" onclick="filterPage('adoption','dog',this)">Dogs</button>
-                    <button class="filter-btn" onclick="filterPage('adoption','cat',this)">Cats</button>
-                </div>
-                <div id="adoption-pets-container" class="pet-grid"></div>
-            </div>
-        </main>
-
-        <main id="view-contact" class="page-view">
-            <div class="container contact-container">
-                <div class="contact-card">
-                    <h2 class="section-title">Contact Us 📞</h2>
-                    <p>Have questions? Reach out directly to our team.</p>
-                    <br>
-                    <a target="_blank" href="https://wa.me/13075337422?text=Hello!" class="wa-large-btn">💬 WhatsApp Support</a>
-                </div>
-            </div>
-        </main>
-
-        <div id="cart-overlay" class="cart-overlay">
-            <div class="cart-panel">
-                <div class="cart-header"><h3>Your Cart</h3><button class="close-cart" onclick="toggleCart()">✕</button></div>
-                <div id="cart-items" class="cart-items"></div>
-                <div class="cart-footer">
-                    <div class="cart-total"><span>Total:</span><span id="cart-total-price">$0</span></div>
-                    <button class="checkout-btn" onclick="checkout()">Checkout via WhatsApp</button>
-                </div>
-            </div>
+    <main id="view-home" class="page-view active">
+      <section class="hero">
+        <h1>Bring Home a Lifetime of Joy</h1>
+        <p>Premium, healthy companions raised with love. Discover your perfect family member today.</p>
+        <div class="hero-checks">
+          <span>100% Healthy</span><span>•</span><span>Vet Checked</span><span>•</span><span>Licensed</span>
         </div>
 
-        <footer>
-            <h3>The Pet Nest</h3>
-            <p>Delivering joy, one pet at a time. © 2026</p>
-        </footer>
-    </div>
-    
-    <div id="mediaViewerModal" class="media-modal">
-        <span class="close-modal" onclick="closeMediaModal()">&times;</span>
-        <div class="modal-content">
-            <div id="modalMediaContainer"></div>
-            <p id="modalMediaDescription" class="modal-desc"></p>
+        <div class="visual-categories" style="margin-top: 40px; z-index: 2;">
+          <div class="cat-mini-banner" onclick="switchPage('sale'); filterPage('sale','all')">
+            <img src="https://images.unsplash.com/photo-1583337130417-3346a1be7dee?auto=format&fit=crop&w=200&q=80" class="cat-real-img" alt="All Pets">
+            <span>All Pets</span>
+          </div>
+          <div class="cat-mini-banner" onclick="switchPage('sale'); filterPage('sale','dog')">
+            <img src="https://images.unsplash.com/photo-1543466835-00a7907e9de1?auto=format&fit=crop&w=200&q=80" class="cat-real-img" alt="Dogs">
+            <span>Dogs</span>
+          </div>
+          <div class="cat-mini-banner" onclick="switchPage('sale'); filterPage('sale','cat')">
+            <img src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?auto=format&fit=crop&w=200&q=80" class="cat-real-img" alt="Cats">
+            <span>Cats</span>
+          </div>
+          <div class="cat-mini-banner" onclick="switchPage('sale'); filterPage('sale','bird')">
+            <img src="https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=200&q=80" class="cat-real-img" alt="Birds">
+            <span>Birds</span>
+          </div>
+          <div class="cat-mini-banner" onclick="switchPage('sale'); filterPage('sale','other')">
+            <img src="https://images.unsplash.com/photo-1581888227599-779811939961?auto=format&fit=crop&w=200&q=80" class="cat-real-img" alt="Others">
+            <span>Others</span>
+          </div>
         </div>
+      </section>
+
+      <section class="promo-container">
+        <div class="promo-card blue">
+          <h3>Premium Nutrition</h3>
+          <p>Natural Freeze Dried Foods</p>
+        </div>
+        <div class="promo-card red">
+          <h3>Summer Sale</h3>
+          <p>Deals Up to 25% Off</p>
+        </div>
+        <div class="promo-card orange">
+          <h3>Accessories</h3>
+          <p>Branded Pet Gear & Toys</p>
+        </div>
+      </section>
+
+      <section class="trust-section">
+        <div class="trust-container">
+          <h2>Why Choose The Pet Nest?</h2>
+          <div class="trust-grid">
+            <div class="trust-card">
+              <div class="trust-icon">🩺</div>
+              <h4>100% Health Guarantee</h4>
+              <p>Every pet is fully vaccinated, microchipped, and rigorously vet-checked before joining your family.</p>
+            </div>
+            <div class="trust-card">
+              <div class="trust-icon">🏡</div>
+              <h4>Ethical & Cage-Free</h4>
+              <p>Our companions are raised with endless love in safe, nurturing, and cage-free environments.</p>
+            </div>
+            <div class="trust-card">
+              <div class="trust-icon">✈️</div>
+              <h4>Safe & Secure Delivery</h4>
+              <p>We provide climate-controlled, stress-free, and safe pet transport right to your doorstep.</p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <main id="view-sale" class="page-view">
+      <div class="container">
+        <div class="fancy-page-header">
+          <h2>Pets for Sale</h2>
+          <p>Choose your perfect companion.</p>
+        </div>
+
+        <div class="page-filters">
+          <button class="filter-btn active-filter" onclick="filterPage('sale','all',this)">All</button>
+          <button class="filter-btn" onclick="filterPage('sale','dog',this)">Dogs</button>
+          <button class="filter-btn" onclick="filterPage('sale','cat',this)">Cats</button>
+          <button class="filter-btn" onclick="filterPage('sale','bird',this)">Birds</button>
+          <button class="filter-btn" onclick="filterPage('sale','other',this)">Other</button>
+        </div>
+
+        <div id="sale-empty" class="empty-state">
+          <div class="empty-icon">🐾</div>
+          <h3>No sale pets found</h3>
+          <p>Please check back soon.</p>
+        </div>
+
+        <div id="sale-pets-container" class="pet-grid"></div>
+        <div style="text-align:center;margin-top:18px;">
+          <button class="filter-btn" onclick="loadMore('sale')">Load More</button>
+        </div>
+      </div>
+    </main>
+
+    <main id="view-adoption" class="page-view">
+      <div class="container">
+        <div class="fancy-page-header">
+          <h2>Pets for Adoption</h2>
+          <p>Give a loving home to a pet in need.</p>
+        </div>
+
+        <div class="page-filters">
+          <button class="filter-btn active-filter" onclick="filterPage('adoption','all',this)">All</button>
+          <button class="filter-btn" onclick="filterPage('adoption','dog',this)">Dogs</button>
+          <button class="filter-btn" onclick="filterPage('adoption','cat',this)">Cats</button>
+          <button class="filter-btn" onclick="filterPage('adoption','bird',this)">Birds</button>
+          <button class="filter-btn" onclick="filterPage('adoption','other',this)">Other</button>
+        </div>
+
+        <div id="adoption-empty" class="empty-state">
+          <div class="empty-icon">🏠</div>
+          <h3>No adoption pets found</h3>
+          <p>Please check back soon.</p>
+        </div>
+
+        <div id="adoption-pets-container" class="pet-grid"></div>
+        <div style="text-align:center;margin-top:18px;">
+          <button class="filter-btn" onclick="loadMore('adoption')">Load More</button>
+        </div>
+      </div>
+    </main>
+
+    <section class="testimonial-section">
+      <h2>Happy Pet Parents</h2>
+      <div class="testimonial-slider">
+        <div class="testimonial-track" id="testimonial-track">
+          </div>
+      </div>
+    </section>
+
+    <section class="beautiful-pets-section">
+      <div class="beautiful-pets-grid">
+        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=500&q=80" alt="Beautiful Dog">
+        <img src="https://images.unsplash.com/photo-1513360371669-4adf3dd7dff8?auto=format&fit=crop&w=500&q=80" alt="Beautiful Cat">
+        <img src="https://images.unsplash.com/photo-1552728089-5710d345f1b1?auto=format&fit=crop&w=500&q=80" alt="Beautiful Bird">
+        <img src="https://images.unsplash.com/photo-1583511655857-d19b40a7a54e?auto=format&fit=crop&w=500&q=80" alt="Beautiful Puppy">
+      </div>
+    </section>
+
+    <div id="fav-overlay" class="cart-overlay">
+      <div class="cart-panel">
+        <div class="cart-header">
+          <h3>Your Favorites</h3>
+          <button class="close-cart" onclick="toggleFav()">✕</button>
+        </div>
+        <div id="fav-items" class="cart-items"></div>
+      </div>
     </div>
 
-    <script>
-        function toggleMobileMenu() {
-            document.getElementById('navMenu').classList.toggle('active');
-        }
+    <div id="cart-overlay" class="cart-overlay">
+      <div class="cart-panel">
+        <div class="cart-header">
+          <h3>Your Cart</h3>
+          <button class="close-cart" onclick="toggleCart()">✕</button>
+        </div>
+        <div id="cart-items" class="cart-items"></div>
+        <div class="cart-footer">
+          <div class="cart-total">
+            <span>Total:</span>
+            <span id="cart-total-price">0</span>
+          </div>
+          <button class="checkout-btn" onclick="checkout()">Checkout via WhatsApp</button>
+        </div>
+      </div>
+    </div>
 
-        function toggleFavorite(btn) {
-            btn.classList.toggle('active-heart');
-            if(btn.classList.contains('active-heart')) {
-                btn.style.background = '#ff4757';
-                btn.style.color = 'white';
-            } else {
-                btn.style.background = 'rgba(255, 255, 255, 0.9)';
-                btn.style.color = 'black';
-            }
-        }
+    <div class="floating-container">
+      <a id="homeBtn" class="float-btn home-btn" onclick="window.scrollTo(0,0)">↑</a>
+      <a class="float-btn wa-btn" target="_blank" href="https://wa.me/13075337422?text=Hello%20The%20Pet%20Nest!%20I%20need%20help.">
+        💬 Customer Care
+      </a>
+    </div>
 
-        function openMediaModal(mediaUrl, isVideo, descriptionText) {
-            const modal = document.getElementById('mediaViewerModal');
-            const container = document.getElementById('modalMediaContainer');
-            const descElement = document.getElementById('modalMediaDescription');
-            
-            descElement.textContent = descriptionText || "No description provided.";
-            
-            if (isVideo) {
-                container.innerHTML = `<video src="${mediaUrl}" controls autoplay playsinline></video>`;
-            } else {
-                container.innerHTML = `<img src="${mediaUrl}" alt="Full screen view">`;
-            }
-            
-            modal.style.display = 'flex';
-        }
+    <footer>
+      <h3>The Pet Nest</h3>
+      <p>Delivering joy, one pet at a time.</p>
+      <p>© 2026 The Pet Nest. All rights reserved.</p>
+    </footer>
 
-        function closeMediaModal() {
-            const modal = document.getElementById('mediaViewerModal');
-            const container = document.getElementById('modalMediaContainer');
-            modal.style.display = 'none';
-            container.innerHTML = ''; // Stops videos from playing in background
-        }
-    </script>
-    <script src="app.js"></script>
+    <div id="media-modal" class="media-modal" onclick="closeMedia()">
+      <div class="modal-card" onclick="event.stopPropagation()">
+        <button class="close-modal" onclick="closeMedia()">&times;</button>
+        <div id="media-modal-media" class="modal-media-container"></div>
+        <div class="modal-text-container">
+          <h3 id="media-modal-title"></h3>
+          <p id="media-modal-desc"></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="app.js"></script>
 </body>
 </html>
