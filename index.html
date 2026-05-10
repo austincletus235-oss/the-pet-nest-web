@@ -263,16 +263,26 @@
           <p>Delivering joy, one pet at a time. Premium companions raised with love.</p>
         </div>
         <div class="footer-links">
-          <a href="#">Privacy Policy</a>
-          <a href="#">Terms of Service</a>
-          <a href="#">FAQs</a>
-          <a href="#">Contact Us</a>
+          <a class="footer-btn" onclick="openInfoModal('privacy')">Privacy Policy</a>
+          <a class="footer-btn" onclick="openInfoModal('terms')">Terms of Service</a>
+          <a class="footer-btn" onclick="openInfoModal('faqs')">FAQs</a>
         </div>
       </div>
       <div class="footer-bottom">
         <p>© 2026 The Pet Nest. All rights reserved.</p>
       </div>
     </footer>
+
+    <!-- INFO / LEGAL MODAL (For Footer Links) -->
+    <div id="info-modal" class="media-modal" onclick="closeInfoModal()">
+      <div class="modal-card info-modal-card" onclick="event.stopPropagation()">
+        <button class="close-modal" onclick="closeInfoModal()">&times;</button>
+        <div class="modal-text-container">
+          <h3 id="info-modal-title" style="margin-top: 10px; margin-bottom: 15px; text-align: center;"></h3>
+          <div id="info-modal-content" style="color: #444; line-height: 1.6; font-size: 0.9rem;"></div>
+        </div>
+      </div>
+    </div>
 
     <!-- MEDIA MODAL -->
     <div id="media-modal" class="media-modal" onclick="closeMedia()">
