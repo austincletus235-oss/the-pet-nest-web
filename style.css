@@ -56,34 +56,42 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
   .logo span { font-size: 1rem; } 
   .logo-img { height: 32px; width: 32px; } 
   header { padding: 8px 4%; gap: 8px; } 
-  /* Hide words "Favorites" and "Cart" on mobile to save space */
   .cart-icon .text-label { display: none; }
   .header-icons-wrap { gap: 8px; }
   .cart-icon { font-size: 1.2rem; padding: 4px; }
 }
 
-/* PAGE VIEWS & HERO */
+/* PAGE VIEWS */
 .page-view { display: none; width: 100%; flex-grow: 1; padding-bottom: 60px; }
 .page-view.active { display: block; animation: fadeIn .3s ease-in-out; }
 @keyframes fadeIn { from { opacity: 0; transform: translateY(10px);} to { opacity:1; transform: translateY(0);} }
 
-/* HERO - With Glassmorphism Box for text readability */
-.hero { background: url("https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80") center/cover; text-align: center; padding: clamp(30px, 6vw, 60px) 5%; min-height: 35vh; display: flex; flex-direction: column; justify-content: center; align-items: center; position: relative; }
+/* FULL SCREEN HERO - MIN HEIGHT 100VH MINUS HEADER */
+.hero { 
+  background: url("https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80") center/cover; 
+  text-align: center; 
+  padding: clamp(30px, 6vw, 60px) 5%; 
+  min-height: calc(100vh - 65px); /* Makes it push right to the bottom of the screen */
+  display: flex; 
+  flex-direction: column; 
+  justify-content: center; 
+  align-items: center; 
+  position: relative; 
+}
 .hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(255,255,255,0.7), rgba(255,255,255,0.9)); z-index: 0; }
-.hero-content-box { position: relative; z-index: 1; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 20px; border-radius: 20px; max-width: 800px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.8); }
+.hero-content-box { position: relative; z-index: 1; background: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); padding: 20px; border-radius: 20px; max-width: 800px; margin-bottom: 30px; border: 1px solid rgba(255,255,255,0.8); }
 .hero h1 { font-size: clamp(1.4rem, 4.5vw, 2.8rem); margin-bottom: 8px; font-weight: 700; color: var(--primary); line-height: 1.2; }
 .hero p { font-size: clamp(0.85rem, 1.8vw, 1rem); font-weight: 500; color: #333; margin-bottom: 12px; }
 .hero-checks { display: flex; gap: 6px 12px; font-weight: 600; color: var(--accent); flex-wrap: wrap; justify-content: center; font-size: clamp(0.75rem, 1.4vw, 0.9rem); }
 
-/* CATEGORIES WITH SCALED DOWN SIZES & GRADIENT OVERLAY */
+/* CATEGORIES - STATIC BADGES */
 .hero-categories { display:flex; justify-content:center; gap: clamp(8px, 1.5vw, 15px); flex-wrap:wrap; max-width:1000px; margin:0 auto; z-index: 2; position: relative; }
-.cat-mini-banner { width: clamp(75px, 20vw, 110px); height: clamp(75px, 20vw, 110px); border-radius: 50%; display:flex; flex-direction:column; justify-content:center; align-items:center; box-shadow: 0 4px 12px rgba(0,0,0,.15); color:#fff; position: relative; overflow: hidden; border: 3px solid #fff; cursor: pointer; transition: transform 0.3s, box-shadow 0.3s; }
+.cat-mini-banner { width: clamp(75px, 20vw, 110px); height: clamp(75px, 20vw, 110px); border-radius: 50%; display:flex; flex-direction:column; justify-content:center; align-items:center; box-shadow: 0 4px 12px rgba(0,0,0,.15); color:#fff; position: relative; overflow: hidden; border: 3px solid #fff; cursor: default; }
 .cat-mini-banner::after { content: ''; position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 50%); z-index: 1; }
-.cat-mini-banner:hover { transform: scale(1.05); box-shadow: 0 6px 18px rgba(0,0,0,.25); border-color: var(--secondary); }
 .cat-mini-banner .real-cat-img { width: 100%; height: 100%; object-fit: cover; position: absolute; top: 0; left: 0; z-index: 0; }
 .cat-mini-banner span { font-weight:600; font-size: clamp(0.75rem, 1.5vw, 0.95rem); letter-spacing: 0.3px; position: relative; z-index: 2; margin-top: auto; padding-bottom: 12px; }
 
-/* PROMOS & SECTIONS - SCALED DOWN */
+/* PROMOS & SECTIONS */
 .promo-container { max-width:1100px; margin:30px auto; padding:0 5%; display:grid; grid-template-columns:repeat(auto-fit, minmax(min(100%, 220px), 1fr)); gap:12px; }
 .promo-card { border-radius:12px; padding: clamp(12px, 3vw, 20px); color:#fff; display:flex; flex-direction:column; justify-content:center; min-height: clamp(80px, 12vw, 130px); box-shadow:0 3px 10px rgba(0,0,0,.06); transition:transform .3s; }
 .promo-card h3 { font-size: clamp(0.95rem, 1.8vw, 1.15rem); font-weight: 600; margin-bottom: 2px; }
@@ -102,12 +110,11 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 .filter-btn { padding: 5px 12px; border: 1px solid var(--primary); background: transparent; color: var(--primary); border-radius: 16px; font-weight: 500; cursor: pointer; transition: .3s; appearance: none; font-size: 0.75rem; }
 .filter-btn:hover, .filter-btn.active-filter { background:var(--primary); color:#fff; }
 
-/* PET GRID & HEART ICON - COMPACT */
+/* PET GRID & HEART ICON */
 .pet-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 12px; margin-top: 10px; align-items: stretch; }
 .pet-card { background:#fff; border-radius:12px; overflow:hidden; box-shadow:0 3px 10px rgba(0,0,0,.05); display:flex; flex-direction:column; transition:all .3s; height:100%; position: relative; border: 1px solid #f0f0f0; }
 .pet-card:hover { transform:translateY(-3px); box-shadow:0 6px 20px rgba(30,60,90,.08); }
 
-/* SVG Heart Styling */
 .heart-btn { position: absolute; top: 8px; right: 8px; z-index: 10; background: rgba(255,255,255,0.9); border: none; border-radius: 50%; width: 30px; height: 30px; display: flex; justify-content: center; align-items: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.15); transition: 0.2s transform, 0.2s background; padding: 0; }
 .heart-btn:hover { transform: scale(1.1); background: #fff; }
 .heart-btn svg { display: block; margin-top: 1px; width: 16px; height: 16px; }
@@ -154,7 +161,7 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 .trust-card h4 { font-size: 0.9rem; color: var(--primary); margin-bottom: 4px; font-weight: 600; }
 .trust-card p { font-size: 0.75rem; color: #555; line-height: 1.5; }
 
-/* FADE IN/OUT TESTIMONIAL SLIDESHOW - CLEAN & COMPACT */
+/* FADE IN/OUT TESTIMONIAL SLIDESHOW */
 .testimonial-section { background: var(--primary); color: #fff; padding: 40px 5%; margin-top: 30px; text-align: center; border-radius: 14px; max-width: 1100px; margin-left: auto; margin-right: auto; width: 92%; box-shadow: 0 5px 15px rgba(30,60,90,0.2); }
 .testimonial-container { max-width: 700px; margin: 0 auto; position: relative; }
 .testimonial-container h2 { font-size: clamp(1.2rem, 3vw, 1.6rem); margin-bottom: 20px; font-weight: 600; color: #fff; }
