@@ -81,20 +81,6 @@ function switchPage(page) {
   renderCurrentView();
 }
 
-// Function to handle clicking on Home Hero Categories
-function filterPageAndGo(page, category) {
-  switchPage(page);
-  // Programmatically click the right filter button
-  const btnId = `btn-${page}-${category}`;
-  const btn = document.getElementById(btnId);
-  if (btn) {
-    filterPage(page, category, btn);
-  } else {
-    // Fallback if button ID isn't found
-    filterPage(page, category, null);
-  }
-}
-
 async function fetchPets() {
   if (!navigator.onLine) return false;
 
