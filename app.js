@@ -47,7 +47,6 @@ function numericPrice(v) {
   const parsed = parseFloat(String(v ?? "").replace(/[^\d.-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
 }
-// Add dollar sign logic
 function formatPrice(v) {
   const num = numericPrice(v);
   return num ? `$${num.toLocaleString()}` : String(v ?? "");
@@ -220,7 +219,11 @@ function petCardTemplate(p) {
   const safeName = safeText(petName);
   const safeDesc = safeText(desc);
   
-  const heartIcon = isFavorite(id) ? "❤️" : "🤍";
+  // Custom SVG Hearts to perfectly match the requested design
+  const emptyHeartSVG = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+  const filledHeartSVG = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="none" fill="#ef4444"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
+  
+  const heartIcon = isFavorite(id) ? filledHeartSVG : emptyHeartSVG;
 
   const readMoreHtml = desc.trim() !== "" 
     ? `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">Read more</span>` 
@@ -388,21 +391,19 @@ function initTestimonials() {
   const wrapper = document.getElementById("testimonial-slideshow");
   if (!wrapper) return;
   
-  wrapper.innerHTML = testimonials.map((t, i) => `
-    <div class="testimonial-slide ${i === 0 ? 'active' : ''}">
+  wrapper.innerHTML = testimonials.map(t => `
+    <div class="testimonial-slide">
       <p>${t.text}</p>
       <h4>${t.author}</h4>
     </div>
   `).join("");
 
-  const slides = wrapper.querySelectorAll('.testimonial-slide');
   let currentSlide = 0;
 
-  // Slow 5-second interval
+  // True Horizontal Slideshow Interval (Slow 5-second slide)
   setInterval(() => {
-    slides[currentSlide].classList.remove('active');
-    currentSlide = (currentSlide + 1) % slides.length;
-    slides[currentSlide].classList.add('active');
+    currentSlide = (currentSlide + 1) % testimonials.length;
+    wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
   }, 5000);
 }
 
