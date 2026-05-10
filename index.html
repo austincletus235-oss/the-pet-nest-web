@@ -14,7 +14,7 @@
 </head>
 <body>
 
-  <!-- FULL SCREEN CHROME DINOSAUR (Shows when network drops) -->
+  <!-- FULL SCREEN CHROME DINOSAUR -->
   <div id="dino-screen" class="dino-screen" style="display: none;">
     <div class="dino-container">
       <svg class="dino-icon" viewBox="0 0 24 24" fill="#9aa0a6" width="60" height="60">
@@ -46,11 +46,11 @@
         </div>
         <div class="header-icons-wrap">
           <div class="cart-icon" onclick="toggleFavorites()">
-            ❤️ Favorites
+            ❤️ <span class="text-label">Favorites</span>
             <span class="cart-count" id="favorites-badge">0</span>
           </div>
           <div class="cart-icon" onclick="toggleCart()">
-            🛒 Cart
+            🛒 <span class="text-label">Cart</span>
             <span class="cart-count" id="cart-badge">0</span>
           </div>
         </div>
@@ -67,28 +67,31 @@
     <!-- HOME -->
     <main id="view-home" class="page-view active">
       <section class="hero">
-        <h1>Bring Home a Lifetime of Joy</h1>
-        <p>Premium, healthy companions raised with love. Discover your perfect family member today.</p>
-        <div class="hero-checks">
-          <span>100% Healthy</span><span>•</span><span>Vet Checked</span><span>•</span><span>Licensed</span>
+        <div class="hero-content-box">
+          <h1>Bring Home a Lifetime of Joy</h1>
+          <p>Premium, healthy companions raised with love. Discover your perfect family member today.</p>
+          <div class="hero-checks">
+            <span>100% Healthy</span><span>•</span><span>Vet Checked</span><span>•</span><span>Licensed</span>
+          </div>
         </div>
         
         <!-- CATEGORIES WITH REAL IMAGES -->
         <div class="visual-categories hero-categories">
-          <div class="cat-mini-banner bg-all">
+          <div class="cat-mini-banner bg-all" onclick="switchPage('sale')">
             <img class="real-cat-img" src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="All Pets">
             <span>All Pets</span>
           </div>
-          <div class="cat-mini-banner bg-dog">
+          <div class="cat-mini-banner bg-dog" onclick="filterPageAndGo('sale', 'dog')">
             <img class="real-cat-img" src="https://images.unsplash.com/photo-1593134257782-e89567b7718a?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Dogs">
             <span>Dogs</span>
           </div>
-          <div class="cat-mini-banner bg-cat">
+          <div class="cat-mini-banner bg-cat" onclick="filterPageAndGo('sale', 'cat')">
             <img class="real-cat-img" src="https://images.unsplash.com/photo-1514888286974-6c03e2ca1dba?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Cats">
             <span>Cats</span>
           </div>
-          <div class="cat-mini-banner bg-bird">
-            <img class="real-cat-img" src="https://images.unsplash.com/photo-1535591273668-578e31182c4f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Birds">
+          <div class="cat-mini-banner bg-bird" onclick="filterPageAndGo('sale', 'bird')">
+            <!-- FIXED ACTUAL PARROT IMAGE -->
+            <img class="real-cat-img" src="https://images.unsplash.com/photo-1550853024-fae8cd4be47f?ixlib=rb-4.0.3&auto=format&fit=crop&w=150&q=80" alt="Birds">
             <span>Birds</span>
           </div>
         </div>
@@ -164,11 +167,11 @@
         </div>
 
         <div class="page-filters">
-          <button class="filter-btn active-filter" onclick="filterPage('sale','all',this)">All</button>
-          <button class="filter-btn" onclick="filterPage('sale','dog',this)">Dogs</button>
-          <button class="filter-btn" onclick="filterPage('sale','cat',this)">Cats</button>
-          <button class="filter-btn" onclick="filterPage('sale','bird',this)">Birds</button>
-          <button class="filter-btn" onclick="filterPage('sale','other',this)">Other</button>
+          <button class="filter-btn active-filter" onclick="filterPage('sale','all',this)" id="btn-sale-all">All</button>
+          <button class="filter-btn" onclick="filterPage('sale','dog',this)" id="btn-sale-dog">Dogs</button>
+          <button class="filter-btn" onclick="filterPage('sale','cat',this)" id="btn-sale-cat">Cats</button>
+          <button class="filter-btn" onclick="filterPage('sale','bird',this)" id="btn-sale-bird">Birds</button>
+          <button class="filter-btn" onclick="filterPage('sale','other',this)" id="btn-sale-other">Other</button>
         </div>
 
         <div id="sale-empty" class="empty-state">
