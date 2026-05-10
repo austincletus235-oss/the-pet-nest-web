@@ -139,13 +139,13 @@ header { background: #fff; padding: 12px 5%; display: flex; justify-content: spa
 .trust-card h4 { font-size: 0.95rem; color: var(--primary); margin-bottom: 6px; font-weight: 600; }
 .trust-card p { font-size: 0.8rem; color: #555; line-height: 1.5; }
 
-/* TRUE HORIZONTAL TESTIMONIAL SLIDESHOW */
+/* FADE IN/OUT TESTIMONIAL SLIDESHOW */
 .testimonial-section { background: var(--primary); color: #fff; padding: 50px 5%; margin-top: 40px; text-align: center; }
 .testimonial-container { max-width: 800px; margin: 0 auto; position: relative; }
 .testimonial-container h2 { font-size: clamp(1.4rem, 3vw, 2rem); margin-bottom: 30px; font-weight: 600; }
-.testimonial-slider { overflow: hidden; width: 100%; position: relative; }
-.slideshow-track { display: flex; transition: transform 1.2s ease-in-out; align-items: center; }
-.testimonial-slide { min-width: 100%; flex-shrink: 0; padding: 10px 20px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.testimonial-slider { position: relative; min-height: 140px; display: flex; justify-content: center; align-items: center; }
+.testimonial-slide { position: absolute; top: 0; left: 0; width: 100%; opacity: 0; transition: opacity 1s ease-in-out; pointer-events: none; }
+.testimonial-slide.active { opacity: 1; pointer-events: auto; position: relative; }
 .testimonial-slide p { font-size: 1.1rem; font-style: italic; line-height: 1.6; margin-bottom: 15px; opacity: 0.9; }
 .testimonial-slide h4 { font-size: 1rem; color: var(--secondary); font-weight: 600; }
 
