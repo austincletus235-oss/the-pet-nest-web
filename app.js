@@ -1,7 +1,9 @@
-// ====== CACHE CLEAR FIX ======
+// ====== CACHE CLEAR FIX: Permanently removes the "Viewing offline copy" bar ======
 if ('serviceWorker' in navigator) {
   navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    for (let registration of registrations) registration.unregister();
+    for(let registration of registrations) {
+      registration.unregister();
+    }
   });
 }
 // ==============================================================================
@@ -15,44 +17,14 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 let salePets = [];
 let adoptionPets = [];
 let cart = [];
-let favorites = JSON.parse(localStorage.getItem("favorites") || "[]");
-let pendingScrollId = null;
+let favorites = []; // New favorites array
 
 let currentView = "home";
 const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// ====== TESTIMONIALS ======
-const testimonials = [
-  { text: "We searched for months and found our perfect companion here. The process was transparent, the pet was healthy, and every promise was kept. Absolutely professional from start to finish.", name: "— Sarah M." },
-  { text: "I was impressed by the care, the documentation, and the follow‑up. Our puppy arrived calm and well‑socialized. This is premium service done right.", name: "— Daniel O." },
-  { text: "Trustworthy, responsive, and organized. They guided us through every step and matched us with the right pet for our family lifestyle.", name: "— Grace K." },
-  { text: "From first inquiry to delivery, everything felt premium. We are truly grateful for the support and the healthy, happy pet.", name: "— Michael T." },
-  { text: "The quality and attention to detail is unmatched. You can tell the pets are raised with real love and expert care.", name: "— Aisha N." },
-  { text: "Smooth communication, fast updates, and a joyful new family member. Could not ask for a better experience.", name: "— Joseph P." },
-  { text: "Professional, honest, and dependable. Our family feels complete. Highly recommended.", name: "— Lina R." },
-  { text: "We received a healthy companion with all vaccines verified. The guidance we received made it stress‑free.", name: "— Emmanuel S." }
-];
-let testimonialIndex = 0;
-
-function startTestimonialSlider() {
-  const textEl = document.getElementById("testimonial-text");
-  const nameEl = document.getElementById("testimonial-name");
-  if (!textEl || !nameEl) return;
-
-  function showTestimonial() {
-    const t = testimonials[testimonialIndex];
-    textEl.textContent = t.text;
-    nameEl.textContent = t.name;
-    testimonialIndex = (testimonialIndex + 1) % testimonials.length;
-  }
-
-  showTestimonial();
-  setInterval(showTestimonial, 8000); // slow slideshow
-}
-
-// Check Online Status
+// Check Online Status - Hides Website & Shows Dinosaur Screen perfectly
 function updateNetworkStatus() {
   const dino = document.getElementById('dino-screen');
   const app = document.getElementById('app-wrapper');
@@ -71,20 +43,15 @@ window.addEventListener('offline', updateNetworkStatus);
 
 function n(v) { return String(v || "").toLowerCase().trim(); }
 function safeText(v = "") { return String(v).replace(/'/g, "\\'").replace(/"/g, '&quot;'); }
-
 function numericPrice(v) {
   const parsed = parseFloat(String(v ?? "").replace(/[^\d.-]/g, ""));
   return Number.isFinite(parsed) ? parsed : 0;
 }
-
+// Add dollar sign logic
 function formatPrice(v) {
-  const str = String(v ?? "").trim();
-  const num = numericPrice(str);
-  if (!str) return "$0";
-  if (str.toLowerCase() === "free") return "Free";
-  return num ? "$" + num.toLocaleString() : (str.startsWith("$") ? str : "$" + str);
+  const num = numericPrice(v);
+  return num ? `$${num.toLocaleString()}` : String(v ?? "");
 }
-
 function isVideo(url = "") {
   const u = url.toLowerCase();
   return u.includes(".mp4") || u.includes(".webm") || u.includes(".mov") || u.includes(".m4v");
@@ -99,7 +66,17 @@ function switchPage(page) {
   document.querySelectorAll(".page-view").forEach((el) => el.classList.remove("active"));
   document.getElementById(`view-${page}`)?.classList.add("active");
   document.getElementById("navMenu")?.classList.remove("active");
+  
+  // Close sidebars if open
+  document.getElementById("cart-overlay")?.classList.remove("active");
+  document.getElementById("favorites-overlay")?.classList.remove("active");
+
   window.scrollTo({ top: 0, behavior: "smooth" });
+  
+  if (page === "home" && document.getElementById("globalSearch")) {
+    document.getElementById("globalSearch").value = "";
+  }
+  
   renderCurrentView();
 }
 
@@ -117,10 +94,22 @@ async function fetchPets() {
   }
 
   const visible = (data || []).filter((p) => ["available", "reserved"].includes(n(p.status)));
+
   salePets = visible.filter((p) => n(p.section) === "sale");
   adoptionPets = visible.filter((p) => n(p.section) === "adoption");
 
   return true;
+}
+
+// REALTIME LISTENER FOR INSTANT ADMIN UPLOAD UPDATES
+function setupRealtimeSubscription() {
+  supabaseClient
+    .channel('public:pets')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'pets' }, payload => {
+      console.log('Realtime change received!', payload);
+      fetchPets().then(() => renderCurrentView());
+    })
+    .subscribe();
 }
 
 function getSearchTerm() {
@@ -157,35 +146,39 @@ function openMedia(url, isVid, title, desc) {
 function closeMedia() {
   const modal = document.getElementById("media-modal");
   const mediaContainer = document.getElementById("media-modal-media");
+  
   modal.classList.remove("active");
   setTimeout(() => { mediaContainer.innerHTML = ""; }, 300);
 }
 
-// FAVORITES
-function isFavorite(id, section) {
-  return favorites.some(f => f.id === id && f.section === section);
-}
-function toggleFavorite(p) {
-  const exists = isFavorite(p.id, p.section);
-  if (exists) {
-    favorites = favorites.filter(f => !(f.id === p.id && f.section === p.section));
+// Favorites Logic
+function toggleFav(id, name, priceText, section) {
+  const index = favorites.findIndex(f => f.id === id);
+  if (index > -1) {
+    favorites.splice(index, 1);
   } else {
-    favorites.push({
-      id: p.id,
-      section: p.section,
-      name: p.name,
-      price: formatPrice(p.price),
-      media_url: p.media_url
-    });
+    favorites.push({ id, name, priceText, section });
   }
-  localStorage.setItem("favorites", JSON.stringify(favorites));
   updateFavoritesUI();
-  renderCurrentView();
+  renderCurrentView(); // re-render to update the heart icons
+}
+
+function isFavorite(id) {
+  return favorites.some(f => f.id === id);
+}
+
+function toggleFavorites() {
+  document.getElementById("favorites-overlay")?.classList.toggle("active");
+  document.getElementById("cart-overlay")?.classList.remove("active");
+}
+
+function goToFavSection(section) {
+  switchPage(section);
 }
 
 function updateFavoritesUI() {
-  const badge = document.getElementById("fav-badge");
-  const list = document.getElementById("fav-items");
+  const badge = document.getElementById("favorites-badge");
+  const list = document.getElementById("favorites-items");
   if (!badge || !list) return;
 
   badge.textContent = favorites.length;
@@ -196,37 +189,23 @@ function updateFavoritesUI() {
     return;
   }
 
-  favorites.forEach((f) => {
+  favorites.forEach((item, idx) => {
     const row = document.createElement("div");
-    row.className = "cart-item";
+    row.className = "cart-item fav-item";
+    row.onclick = () => goToFavSection(item.section);
+    
+    const displaySection = item.section === 'sale' ? 'Pets for Sale' : 'Adoption';
+    
     row.innerHTML = `
       <div>
-        <strong>${f.name}</strong>
-        <p>${f.price}</p>
-        <small>Section: ${f.section}</small>
+        <strong>${item.name}</strong>
+        <p>${item.priceText}</p>
+        <span class="fav-section-tag">${displaySection}</span>
       </div>
-      <button class="remove-btn" onclick="removeFavorite('${f.id}','${f.section}')">Remove</button>
+      <button class="remove-btn" onclick="event.stopPropagation(); toggleFav('${item.id}', '${item.name}', '${item.priceText}', '${item.section}')">Remove</button>
     `;
-    row.onclick = () => goToFavorite(f.id, f.section);
     list.appendChild(row);
   });
-}
-
-function removeFavorite(id, section) {
-  favorites = favorites.filter(f => !(String(f.id) === String(id) && f.section === section));
-  localStorage.setItem("favorites", JSON.stringify(favorites));
-  updateFavoritesUI();
-  renderCurrentView();
-}
-
-function goToFavorite(id, section) {
-  pendingScrollId = `pet-${section}-${id}`;
-  switchPage(section === "adoption" ? "adoption" : "sale");
-  toggleFavorites();
-}
-
-function toggleFavorites() {
-  document.getElementById("fav-overlay")?.classList.toggle("active");
 }
 
 function petCardTemplate(p) {
@@ -236,22 +215,23 @@ function petCardTemplate(p) {
   const section = n(p.section);
   const desc = p.description || "";
   const isVid = isVideo(media);
+  const id = p.id;
 
   const safeName = safeText(petName);
   const safeDesc = safeText(desc);
-  const favActive = isFavorite(p.id, section);
+  
+  const heartIcon = isFavorite(id) ? "❤️" : "🤍";
 
   const readMoreHtml = desc.trim() !== "" 
     ? `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">Read more</span>` 
     : `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">View Media</span>`;
 
   return `
-    <div class="pet-card" id="pet-${section}-${p.id}">
-      <button class="favorite-btn ${favActive ? "active" : ""}" onclick='toggleFavorite(${JSON.stringify(p)})'>
-        ${favActive ? "♥" : "♡"}
-      </button>
+    <div class="pet-card">
+      <button class="heart-btn" onclick="toggleFav('${id}', '${safeName}', '${petPrice}', '${section}')">${heartIcon}</button>
       <div class="pet-media-wrap" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">
-        ${isVid
+        ${
+          isVid
             ? `<video class="pet-image" src="${media}" autoplay muted loop playsinline preload="metadata"></video>`
             : `<img class="pet-image" src="${media}" alt="${petName}" loading="lazy" onerror="this.src='https://placehold.co/400x300?text=No+Image'">`
         }
@@ -301,19 +281,12 @@ function renderCurrentView() {
   let aList = applyCategory(adoptionPets, selectedCategory.adoption);
   aList = applySearch(aList, term).slice(0, visibleCounts.adoption);
   renderGrid("adoption-pets-container", aList, "adoption-empty");
-
-  if (pendingScrollId) {
-    const el = document.getElementById(pendingScrollId);
-    if (el) {
-      el.scrollIntoView({ behavior: "smooth", block: "center" });
-      pendingScrollId = null;
-    }
-  }
 }
 
 function filterPage(pageType, category, btn) {
   selectedCategory[pageType] = category;
   visibleCounts[pageType] = PAGE_SIZE;
+
   if (btn?.parentElement) {
     btn.parentElement.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active-filter"));
     btn.classList.add("active-filter");
@@ -336,7 +309,10 @@ function loadMore(pageType) {
   renderCurrentView();
 }
 
-function toggleCart() { document.getElementById("cart-overlay")?.classList.toggle("active"); }
+function toggleCart() { 
+  document.getElementById("cart-overlay")?.classList.toggle("active"); 
+  document.getElementById("favorites-overlay")?.classList.remove("active");
+}
 
 function addToCart(name, priceText) {
   cart.push({ name, priceText, price: numericPrice(priceText) });
@@ -375,7 +351,7 @@ function updateCartUI() {
     `;
     list.appendChild(row);
   });
-  totalEl.textContent = "$" + total.toLocaleString();
+  totalEl.textContent = `$${total.toLocaleString()}`;
 }
 
 function buyNow(name, priceText, section) {
@@ -389,4 +365,66 @@ function checkout() {
   if (!cart.length) return alert("Cart is empty.");
   const whatsapp = "13075337422";
   let total = 0; let lines = "";
-  cart.forEach((item) => { total += item.price; lines += `• ${`*
+  cart.forEach((item) => { total += item.price; lines += `• ${item.name} - ${item.priceText}\n`; });
+  const msg = `Hello The Pet Nest!\n\nI want to order these pets:\n\n${lines}\nTotal: $${total.toLocaleString()}\n\nPlease confirm availability.`;
+  window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
+}
+
+// Professional Testimonial Data
+const testimonials = [
+  { text: "“The Pet Nest made finding our Golden Retriever so incredibly easy. He arrived perfectly healthy and extremely well-socialized. We are beyond thrilled.”", author: "- Sarah & Mark T." },
+  { text: "“I was hesitant about buying a pet online, but their 100% health guarantee and constant communication put me at ease. Best decision we've made!”", author: "- Jessica R." },
+  { text: "“Our adopted tabby cat settled in immediately. You can tell she was raised in a loving, cage-free environment. Thank you, Pet Nest!”", author: "- Emily W." },
+  { text: "“The delivery was smooth, climate-controlled, and on time. Our new puppy stepped out of the carrier happy and ready to play.”", author: "- David L." },
+  { text: "“Five stars for customer care! They answered every question I had about parrot nutrition and care before we made our purchase.”", author: "- Amanda J." },
+  { text: "“Highly professional team. The vet records were impeccable, and our new Frenchie is the star of the neighborhood.”", author: "- The Connor Family" },
+  { text: "“If you are looking for an ethical place to find your next companion, this is it. No cages, just pure love and care.”", author: "- Michael P." },
+  { text: "“We adopted two kittens from the adoption section. They were healthy, microchipped, and litter-trained. A seamless experience.”", author: "- Laura S." },
+  { text: "“I appreciate the transparency and the premium food recommendations provided when we bought our Husky. Top tier service.”", author: "- Jason B." },
+  { text: "“Simply the best place to find premium, healthy pets. The staff truly cares about the animals they place in new homes.”", author: "- Chloe M." }
+];
+
+function initTestimonials() {
+  const wrapper = document.getElementById("testimonial-slideshow");
+  if (!wrapper) return;
+  
+  wrapper.innerHTML = testimonials.map((t, i) => `
+    <div class="testimonial-slide ${i === 0 ? 'active' : ''}">
+      <p>${t.text}</p>
+      <h4>${t.author}</h4>
+    </div>
+  `).join("");
+
+  const slides = wrapper.querySelectorAll('.testimonial-slide');
+  let currentSlide = 0;
+
+  // Slow 5-second interval
+  setInterval(() => {
+    slides[currentSlide].classList.remove('active');
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add('active');
+  }, 5000);
+}
+
+window.onscroll = function () {
+  const btn = document.getElementById("homeBtn");
+  if (!btn) return;
+  if (document.body.scrollTop > 300 || document.documentElement.scrollTop > 300) btn.classList.add("visible");
+  else btn.classList.remove("visible");
+};
+
+async function init() {
+  updateNetworkStatus();
+  
+  if (navigator.onLine) {
+    await fetchPets();
+    setupRealtimeSubscription(); // Init Realtime updates
+  }
+  
+  initTestimonials();
+  renderCurrentView();
+  updateCartUI();
+  updateFavoritesUI();
+}
+
+init();
