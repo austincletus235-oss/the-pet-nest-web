@@ -17,7 +17,9 @@ const supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_
 let salePets = [];
 let adoptionPets = [];
 let cart = [];
-let favorites = []; // New favorites array
+
+// Initialize favorites from browser LocalStorage to keep memory across refreshes
+let favorites = JSON.parse(localStorage.getItem('petNestFavorites')) || [];
 
 let currentView = "home";
 const PAGE_SIZE = 8;
@@ -150,7 +152,7 @@ function closeMedia() {
   setTimeout(() => { mediaContainer.innerHTML = ""; }, 300);
 }
 
-// Favorites Logic
+// Favorites Logic - Persists to LocalStorage
 function toggleFav(id, name, priceText, section) {
   const index = favorites.findIndex(f => f.id === id);
   if (index > -1) {
@@ -158,6 +160,10 @@ function toggleFav(id, name, priceText, section) {
   } else {
     favorites.push({ id, name, priceText, section });
   }
+  
+  // Save immediately to memory
+  localStorage.setItem('petNestFavorites', JSON.stringify(favorites));
+  
   updateFavoritesUI();
   renderCurrentView(); // re-render to update the heart icons
 }
@@ -219,7 +225,7 @@ function petCardTemplate(p) {
   const safeName = safeText(petName);
   const safeDesc = safeText(desc);
   
-  // Custom SVG Hearts to perfectly match the requested design
+  // Custom SVG Hearts matching exactly the design screenshot
   const emptyHeartSVG = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
   const filledHeartSVG = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="none" fill="#ef4444"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
   
@@ -391,19 +397,21 @@ function initTestimonials() {
   const wrapper = document.getElementById("testimonial-slideshow");
   if (!wrapper) return;
   
-  wrapper.innerHTML = testimonials.map(t => `
-    <div class="testimonial-slide">
+  wrapper.innerHTML = testimonials.map((t, i) => `
+    <div class="testimonial-slide ${i === 0 ? 'active' : ''}">
       <p>${t.text}</p>
       <h4>${t.author}</h4>
     </div>
   `).join("");
 
+  const slides = wrapper.querySelectorAll('.testimonial-slide');
   let currentSlide = 0;
 
-  // True Horizontal Slideshow Interval (Slow 5-second slide)
+  // Fade Slide Interval (Slow 5-second fade)
   setInterval(() => {
-    currentSlide = (currentSlide + 1) % testimonials.length;
-    wrapper.style.transform = `translateX(-${currentSlide * 100}%)`;
+    slides[currentSlide].classList.remove('active');
+    currentSlide = (currentSlide + 1) % slides.length;
+    slides[currentSlide].classList.add('active');
   }, 5000);
 }
 
@@ -425,7 +433,7 @@ async function init() {
   initTestimonials();
   renderCurrentView();
   updateCartUI();
-  updateFavoritesUI();
+  updateFavoritesUI(); // Load saved favorites UI
 }
 
 init();
