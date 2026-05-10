@@ -26,7 +26,7 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// Check Online Status - Hides Website & Shows Dinosaur Screen perfectly
+// Check Online Status
 function updateNetworkStatus() {
   const dino = document.getElementById('dino-screen');
   const app = document.getElementById('app-wrapper');
@@ -42,7 +42,7 @@ function updateNetworkStatus() {
 window.addEventListener('online', () => { updateNetworkStatus(); init(); });
 window.addEventListener('offline', updateNetworkStatus);
 
-// CUSTOM TOAST NOTIFICATION SYSTEM
+// CUSTOM TOAST NOTIFICATION SYSTEM (Replaces alert)
 function showToast(message) {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -53,7 +53,7 @@ function showToast(message) {
   
   container.appendChild(toast);
   
-  // Remove toast from DOM after animation completes (3 seconds)
+  // Remove toast from DOM after animation completes
   setTimeout(() => {
     toast.remove();
   }, 3000);
@@ -141,7 +141,7 @@ function applyCategory(list, cat) {
   return list.filter((p) => n(p.category) === cat);
 }
 
-// Modal Logic
+// Media Modal Logic
 function openMedia(url, isVid, title, desc) {
   if (!url || url === "null" || url.includes("placehold.co")) return;
   const modal = document.getElementById("media-modal");
@@ -168,7 +168,31 @@ function closeMedia() {
   setTimeout(() => { mediaContainer.innerHTML = ""; }, 300);
 }
 
-// Favorites Logic - Persists to LocalStorage
+// Info / Legal Modal Logic (For Footer Links)
+function openInfoModal(type) {
+  const modal = document.getElementById("info-modal");
+  const titleEl = document.getElementById("info-modal-title");
+  const contentEl = document.getElementById("info-modal-content");
+
+  if(type === 'privacy') {
+    titleEl.textContent = "Privacy Policy";
+    contentEl.innerHTML = "<p>We value your privacy. All personal information collected is securely stored and never shared with third parties without your explicit consent. We only use your data to process orders, provide customer support, and improve your experience on our platform.</p><br><p>Your payment information is encrypted and handled by secure third-party processors.</p>";
+  } else if(type === 'terms') {
+    titleEl.textContent = "Terms of Service";
+    contentEl.innerHTML = "<p>By using The Pet Nest, you agree to our terms of service. All pet sales are subject to our comprehensive health guarantee and return policy.</p><br><p>We reserve the right to refuse service to ensure the safety and well-being of our animals. Prices are subject to change without prior notice.</p>";
+  } else if(type === 'faqs') {
+    titleEl.textContent = "Frequently Asked Questions";
+    contentEl.innerHTML = "<strong>How does delivery work?</strong><br><p style='margin-bottom: 10px;'>We use safe, climate-controlled pet transport directly to your door. A specialist will accompany your pet to ensure they are stress-free.</p><strong>Are the pets vaccinated?</strong><br><p style='margin-bottom: 10px;'>Yes, all pets are 100% vet-checked, fully vaccinated up to their age, and microchipped.</p><strong>Do you offer a health guarantee?</strong><br><p>Yes! We offer a comprehensive health guarantee against genetic defects. Details will be provided during purchase.</p>";
+  }
+
+  modal.classList.add("active");
+}
+
+function closeInfoModal() {
+  document.getElementById("info-modal").classList.remove("active");
+}
+
+// Favorites Logic
 function toggleFav(id, name, priceText, section) {
   const index = favorites.findIndex(f => f.id === id);
   if (index > -1) {
@@ -179,11 +203,9 @@ function toggleFav(id, name, priceText, section) {
     showToast(`${name} added to favorites ❤️`);
   }
   
-  // Save immediately to memory
   localStorage.setItem('petNestFavorites', JSON.stringify(favorites));
-  
   updateFavoritesUI();
-  renderCurrentView(); // re-render to update the heart icons
+  renderCurrentView(); 
 }
 
 function isFavorite(id) {
@@ -243,7 +265,6 @@ function petCardTemplate(p) {
   const safeName = safeText(petName);
   const safeDesc = safeText(desc);
   
-  // Custom SVG Hearts
   const emptyHeartSVG = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="#000" stroke-width="2.5" fill="none" stroke-linecap="round" stroke-linejoin="round"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
   const filledHeartSVG = `<svg viewBox="0 0 24 24" width="20" height="20" stroke="none" fill="#ef4444"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path></svg>`;
   
@@ -314,14 +335,12 @@ function filterPage(pageType, category, btn) {
   selectedCategory[pageType] = category;
   visibleCounts[pageType] = PAGE_SIZE;
 
-  // Clear all buttons first
   const filterBtns = document.getElementById(`view-${pageType}`).querySelectorAll('.filter-btn');
   filterBtns.forEach(b => b.classList.remove('active-filter'));
   
   if (btn) {
     btn.classList.add("active-filter");
   } else {
-    // If no btn provided, try to find it by ID
     const targetBtn = document.getElementById(`btn-${pageType}-${category}`);
     if (targetBtn) targetBtn.classList.add("active-filter");
   }
@@ -352,7 +371,6 @@ function toggleCart() {
 function addToCart(name, priceText) {
   cart.push({ name, priceText, price: numericPrice(priceText) });
   updateCartUI();
-  // Using modern toast instead of alert
   showToast(`${name} added to cart 🛒`); 
 }
 
@@ -398,9 +416,9 @@ function buyNow(name, priceText, section) {
 }
 
 function checkout() {
-  if (!cart.length) return {
-    // Show toast instead of alert if empty
+  if (!cart.length) {
     showToast("Your cart is empty!");
+    return; // THIS WAS THE BUG THAT CRASHED THE SCRIPT. IT IS NOW FIXED.
   }
   const whatsapp = "13075337422";
   let total = 0; let lines = "";
@@ -463,15 +481,15 @@ async function init() {
   updateNetworkStatus();
   
   if (navigator.onLine) {
-    showSpinners(); // Show loading UI before fetching
+    showSpinners(); 
     await fetchPets();
-    setupRealtimeSubscription(); // Init Realtime updates
+    setupRealtimeSubscription(); 
   }
   
   initTestimonials();
   renderCurrentView();
   updateCartUI();
-  updateFavoritesUI(); // Load saved favorites UI
+  updateFavoritesUI(); 
 }
 
 init();
