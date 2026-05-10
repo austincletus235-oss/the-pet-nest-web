@@ -15,6 +15,14 @@
                 <img src="logo.png" alt="Logo" class="logo-img" onerror="this.src='https://images.unsplash.com/photo-1543466835-00a7907e9de1?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80'">
                 <span>The Pet Nest</span>
             </a>
+            
+            <nav class="nav-links" id="navMenu">
+                <a onclick="switchPage('home')">🏠 Home</a>
+                <a onclick="switchPage('sale')">🐕 Buy a Pet</a>
+                <a onclick="switchPage('adoption')">🏡 Adopt a Pet</a>
+                <a onclick="switchPage('contact')">📞 Contact Us</a>
+            </nav>
+
             <div class="header-controls">
                 <div class="search-bar">
                     <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" />
@@ -25,12 +33,6 @@
                 </div>
                 <button class="hamburger" onclick="toggleMobileMenu()">☰</button>
             </div>
-            <nav class="nav-links" id="navMenu">
-                <a onclick="switchPage('home')">🏠 Home</a>
-                <a onclick="switchPage('sale')">🐕 Buy a Pet</a>
-                <a onclick="switchPage('adoption')">🏡 Adopt a Pet</a>
-                <a onclick="switchPage('contact')">📞 Contact Us</a>
-            </nav>
         </header>
 
         <main id="view-home" class="page-view active">
@@ -54,6 +56,10 @@
                             <div class="category-item">
                                 <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1444464666168-49d633b86797?auto=format&fit=crop&w=200&q=80" alt="Birds"></div>
                                 <span>Birds</span>
+                            </div>
+                            <div class="category-item">
+                                <div class="cat-img-wrap"><img src="https://images.unsplash.com/photo-1548767797-d8c844163c4c?auto=format&fit=crop&w=200&q=80" alt="Others"></div>
+                                <span>Others</span>
                             </div>
                         </div>
                     </div>
@@ -221,10 +227,22 @@
             <section class="animal-gallery container">
                 <h2 class="section-title">Our Happy Pets</h2>
                 <div class="gallery-grid">
-                    <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=400&q=80" alt="Dog">
-                    <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=400&q=80" alt="Cat">
-                    <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80" alt="Dog">
-                    <img src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=400&q=80" alt="Kitten">
+                    <div class="media-container">
+                        <img src="https://images.unsplash.com/photo-1548199973-03cce0bbc87b?auto=format&fit=crop&w=400&q=80" alt="Dog" onclick="openMediaModal(this.src, false, 'A happy golden retriever finding its forever home!')">
+                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    <div class="media-container">
+                        <img src="https://images.unsplash.com/photo-1573865526739-10659fec78a5?auto=format&fit=crop&w=400&q=80" alt="Cat" onclick="openMediaModal(this.src, false, 'A playful kitten exploring the living room.')">
+                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    <div class="media-container">
+                        <img src="https://images.unsplash.com/photo-1552053831-71594a27632d?auto=format&fit=crop&w=400&q=80" alt="Dog" onclick="openMediaModal(this.src, false, 'Energetic husky ready for a walk.')">
+                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
+                    <div class="media-container">
+                        <img src="https://images.unsplash.com/photo-1511044568932-338cba0ad803?auto=format&fit=crop&w=400&q=80" alt="Kitten" onclick="openMediaModal(this.src, false, 'Sleepy rescue kitten napping.')">
+                        <button class="fav-btn" onclick="toggleFavorite(this)">❤️</button>
+                    </div>
                 </div>
             </section>
         </main>
@@ -281,9 +299,51 @@
         </footer>
     </div>
     
+    <div id="mediaViewerModal" class="media-modal">
+        <span class="close-modal" onclick="closeMediaModal()">&times;</span>
+        <div class="modal-content">
+            <div id="modalMediaContainer"></div>
+            <p id="modalMediaDescription" class="modal-desc"></p>
+        </div>
+    </div>
+
     <script>
         function toggleMobileMenu() {
             document.getElementById('navMenu').classList.toggle('active');
+        }
+
+        function toggleFavorite(btn) {
+            btn.classList.toggle('active-heart');
+            if(btn.classList.contains('active-heart')) {
+                btn.style.background = '#ff4757';
+                btn.style.color = 'white';
+            } else {
+                btn.style.background = 'rgba(255, 255, 255, 0.9)';
+                btn.style.color = 'black';
+            }
+        }
+
+        function openMediaModal(mediaUrl, isVideo, descriptionText) {
+            const modal = document.getElementById('mediaViewerModal');
+            const container = document.getElementById('modalMediaContainer');
+            const descElement = document.getElementById('modalMediaDescription');
+            
+            descElement.textContent = descriptionText || "No description provided.";
+            
+            if (isVideo) {
+                container.innerHTML = `<video src="${mediaUrl}" controls autoplay playsinline></video>`;
+            } else {
+                container.innerHTML = `<img src="${mediaUrl}" alt="Full screen view">`;
+            }
+            
+            modal.style.display = 'flex';
+        }
+
+        function closeMediaModal() {
+            const modal = document.getElementById('mediaViewerModal');
+            const container = document.getElementById('modalMediaContainer');
+            modal.style.display = 'none';
+            container.innerHTML = ''; // Stops videos from playing in background
         }
     </script>
     <script src="app.js"></script>
