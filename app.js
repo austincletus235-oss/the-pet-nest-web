@@ -81,6 +81,20 @@ function switchPage(page) {
   renderCurrentView();
 }
 
+// Function to handle clicking on Home Hero Categories
+function filterPageAndGo(page, category) {
+  switchPage(page);
+  // Programmatically click the right filter button
+  const btnId = `btn-${page}-${category}`;
+  const btn = document.getElementById(btnId);
+  if (btn) {
+    filterPage(page, category, btn);
+  } else {
+    // Fallback if button ID isn't found
+    filterPage(page, category, null);
+  }
+}
+
 async function fetchPets() {
   if (!navigator.onLine) return false;
 
@@ -296,10 +310,18 @@ function filterPage(pageType, category, btn) {
   selectedCategory[pageType] = category;
   visibleCounts[pageType] = PAGE_SIZE;
 
-  if (btn?.parentElement) {
-    btn.parentElement.querySelectorAll(".filter-btn").forEach((b) => b.classList.remove("active-filter"));
+  // Clear all buttons first
+  const filterBtns = document.getElementById(`view-${pageType}`).querySelectorAll('.filter-btn');
+  filterBtns.forEach(b => b.classList.remove('active-filter'));
+  
+  if (btn) {
     btn.classList.add("active-filter");
+  } else {
+    // If no btn provided, try to find it by ID
+    const targetBtn = document.getElementById(`btn-${pageType}-${category}`);
+    if (targetBtn) targetBtn.classList.add("active-filter");
   }
+  
   renderCurrentView();
 }
 
