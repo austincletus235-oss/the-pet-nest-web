@@ -284,14 +284,18 @@
       </div>
     </div>
 
-    <!-- MEDIA MODAL -->
+    <!-- UPGRADED MEDIA MODAL WITH ACTION BUTTONS -->
     <div id="media-modal" class="media-modal" onclick="closeMedia()">
       <div class="modal-card" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeMedia()">&times;</button>
         <div id="media-modal-media" class="modal-media-container"></div>
         <div class="modal-text-container">
-          <h3 id="media-modal-title"></h3>
+          <div class="modal-header-flex">
+            <h3 id="media-modal-title"></h3>
+            <span id="media-modal-price" class="pet-price" style="font-size: 1.1rem;"></span>
+          </div>
           <p id="media-modal-desc"></p>
+          <button id="media-modal-buy-btn" class="buy-btn" style="margin-top: 15px; width: 100%; padding: 10px; font-size: 1rem;">Inquire Now</button>
         </div>
       </div>
     </div>
