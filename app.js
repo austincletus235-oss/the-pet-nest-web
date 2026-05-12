@@ -42,7 +42,7 @@ function updateNetworkStatus() {
 window.addEventListener('online', () => { updateNetworkStatus(); init(); });
 window.addEventListener('offline', updateNetworkStatus);
 
-// CUSTOM TOAST NOTIFICATION SYSTEM (Replaces alert)
+// CUSTOM TOAST NOTIFICATION SYSTEM
 function showToast(message) {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -141,13 +141,16 @@ function applyCategory(list, cat) {
   return list.filter((p) => n(p.category) === cat);
 }
 
-// Media Modal Logic
-function openMedia(url, isVid, title, desc) {
-  if (!url || url === "null" || url.includes("placehold.co")) return;
+// UPGRADED MEDIA MODAL LOGIC
+function openMedia(url, isVid, title, desc, price, section) {
+  if (!url || url === "null") return;
+  
   const modal = document.getElementById("media-modal");
   const mediaContainer = document.getElementById("media-modal-media");
   const titleEl = document.getElementById("media-modal-title");
   const descEl = document.getElementById("media-modal-desc");
+  const priceEl = document.getElementById("media-modal-price");
+  const buyBtn = document.getElementById("media-modal-buy-btn");
   
   if (isVid) {
     mediaContainer.innerHTML = `<video src="${url}" controls autoplay playsinline></video>`;
@@ -157,6 +160,12 @@ function openMedia(url, isVid, title, desc) {
 
   titleEl.textContent = title || "Pet Details";
   descEl.textContent = desc || "No details provided.";
+  priceEl.textContent = price || "";
+  
+  buyBtn.onclick = () => {
+    buyNow(title, price, section);
+  };
+  
   modal.classList.add("active");
 }
 
@@ -271,13 +280,13 @@ function petCardTemplate(p) {
   const heartIcon = isFavorite(id) ? filledHeartSVG : emptyHeartSVG;
 
   const readMoreHtml = desc.trim() !== "" 
-    ? `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">Read more</span>` 
-    : `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">View Media</span>`;
+    ? `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}', '${petPrice}', '${section}')">Read more</span>` 
+    : `<span class="read-more-btn" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}', '${petPrice}', '${section}')">View Media</span>`;
 
   return `
     <div class="pet-card">
       <button class="heart-btn" onclick="toggleFav('${id}', '${safeName}', '${petPrice}', '${section}')">${heartIcon}</button>
-      <div class="pet-media-wrap" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}')">
+      <div class="pet-media-wrap" onclick="openMedia('${media}', ${isVid}, '${safeName}', '${safeDesc}', '${petPrice}', '${section}')">
         ${
           isVid
             ? `<video class="pet-image" src="${media}" autoplay muted loop playsinline preload="metadata"></video>`
@@ -418,7 +427,7 @@ function buyNow(name, priceText, section) {
 function checkout() {
   if (!cart.length) {
     showToast("Your cart is empty!");
-    return; // THIS WAS THE BUG THAT CRASHED THE SCRIPT. IT IS NOW FIXED.
+    return; 
   }
   const whatsapp = "13075337422";
   let total = 0; let lines = "";
@@ -469,12 +478,28 @@ window.onscroll = function () {
   else btn.classList.remove("visible");
 };
 
+// PREMIUM SKELETON LOADERS
 function showSpinners() {
-  const loaderHTML = '<div class="loader-container"><div class="loader"></div></div>';
+  const skeletonCards = Array(8).fill(`
+    <div class="skeleton-card">
+      <div class="skeleton-img"></div>
+      <div class="skeleton-info">
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line price"></div>
+        <div class="skeleton-line"></div>
+        <div class="skeleton-line short"></div>
+        <div class="skeleton-btn-wrap">
+          <div class="skeleton-btn"></div>
+          <div class="skeleton-btn"></div>
+        </div>
+      </div>
+    </div>
+  `).join('');
+
   const saleBox = document.getElementById("sale-pets-container");
   const adoptBox = document.getElementById("adoption-pets-container");
-  if(saleBox) saleBox.innerHTML = loaderHTML;
-  if(adoptBox) adoptBox.innerHTML = loaderHTML;
+  if(saleBox) saleBox.innerHTML = skeletonCards;
+  if(adoptBox) adoptBox.innerHTML = skeletonCards;
 }
 
 async function init() {
@@ -482,7 +507,13 @@ async function init() {
   
   if (navigator.onLine) {
     showSpinners(); 
-    await fetchPets();
+    
+    // Force the skeleton loaders to display for exactly 3 seconds so the premium animation is visible to the user
+    await Promise.all([
+      fetchPets(),
+      new Promise(resolve => setTimeout(resolve, 3000)) // Changed from 1000 to 3000
+    ]);
+    
     setupRealtimeSubscription(); 
   }
   
