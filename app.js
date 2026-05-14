@@ -511,7 +511,7 @@ async function init() {
     // Force the skeleton loaders to display for exactly 3 seconds so the premium animation is visible to the user
     await Promise.all([
       fetchPets(),
-      new Promise(resolve => setTimeout(resolve, 3000)) // Changed from 1000 to 3000
+      new Promise(resolve => setTimeout(resolve, 3000)) 
     ]);
     
     setupRealtimeSubscription(); 
