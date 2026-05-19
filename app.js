@@ -26,7 +26,7 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// Check Online Status
+// Check Online Status - Now matches the Google Chrome offline screen
 function updateNetworkStatus() {
   const dino = document.getElementById('dino-screen');
   const app = document.getElementById('app-wrapper');
