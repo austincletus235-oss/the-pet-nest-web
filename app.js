@@ -1,12 +1,12 @@
-// ====== CACHE CLEAR FIX: Permanently removes the "Viewing offline copy" bar ======
+// ====== OFFLINE MODE CACHE SYSTEM ======
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.getRegistrations().then(function(registrations) {
-    for(let registration of registrations) {
-      registration.unregister();
-    }
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').then(reg => {
+      console.log('Offline system active');
+    }).catch(err => console.log('Offline system failed', err));
   });
 }
-// ==============================================================================
+// =======================================
 
 const SUPABASE_URL = "https://mbpdimmuuzrxgsraofew.supabase.co";
 const SUPABASE_ANON_KEY =
@@ -18,7 +18,6 @@ let salePets = [];
 let adoptionPets = [];
 let cart = [];
 
-// Initialize favorites from browser LocalStorage to keep memory across refreshes
 let favorites = JSON.parse(localStorage.getItem('petNestFavorites')) || [];
 
 let currentView = "home";
@@ -26,7 +25,6 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-// Check Online Status - Now matches the Google Chrome offline screen
 function updateNetworkStatus() {
   const dino = document.getElementById('dino-screen');
   const app = document.getElementById('app-wrapper');
@@ -42,7 +40,6 @@ function updateNetworkStatus() {
 window.addEventListener('online', () => { updateNetworkStatus(); init(); });
 window.addEventListener('offline', updateNetworkStatus);
 
-// CUSTOM TOAST NOTIFICATION SYSTEM
 function showToast(message) {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -53,10 +50,7 @@ function showToast(message) {
   
   container.appendChild(toast);
   
-  // Remove toast from DOM after animation completes
-  setTimeout(() => {
-    toast.remove();
-  }, 3000);
+  setTimeout(() => { toast.remove(); }, 3000);
 }
 
 function n(v) { return String(v || "").toLowerCase().trim(); }
@@ -84,7 +78,6 @@ function switchPage(page) {
   document.getElementById(`view-${page}`)?.classList.add("active");
   document.getElementById("navMenu")?.classList.remove("active");
   
-  // Close sidebars if open
   document.getElementById("cart-overlay")?.classList.remove("active");
   document.getElementById("favorites-overlay")?.classList.remove("active");
 
@@ -118,12 +111,10 @@ async function fetchPets() {
   return true;
 }
 
-// REALTIME LISTENER FOR INSTANT ADMIN UPLOAD UPDATES
 function setupRealtimeSubscription() {
   supabaseClient
     .channel('public:pets')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'pets' }, payload => {
-      console.log('Realtime change received!', payload);
       fetchPets().then(() => renderCurrentView());
     })
     .subscribe();
@@ -132,16 +123,27 @@ function setupRealtimeSubscription() {
 function getSearchTerm() {
   return String(document.getElementById("globalSearch")?.value || "").trim().toLowerCase();
 }
+
+// ====== UPGRADED SEARCH SYSTEM (Name, Breed/Description, Category, Price) ======
 function applySearch(list, term) {
   if (!term) return [...list];
-  return list.filter((p) => n(p.name).includes(term) || n(p.category).includes(term));
+  return list.filter((p) => {
+    const t = n(term);
+    const nameMatch = n(p.name).includes(t);
+    const catMatch = n(p.category).includes(t);
+    const descMatch = n(p.description).includes(t); // Broad search captures breeds written in desc
+    const priceStr = String(p.price || "").toLowerCase();
+    const formattedPrice = formatPrice(p.price).toLowerCase();
+    
+    return nameMatch || catMatch || descMatch || priceStr.includes(t) || formattedPrice.includes(t);
+  });
 }
+
 function applyCategory(list, cat) {
   if (cat === "all") return [...list];
   return list.filter((p) => n(p.category) === cat);
 }
 
-// UPGRADED MEDIA MODAL LOGIC
 function openMedia(url, isVid, title, desc, price, section) {
   if (!url || url === "null") return;
   
@@ -162,22 +164,18 @@ function openMedia(url, isVid, title, desc, price, section) {
   descEl.textContent = desc || "No details provided.";
   priceEl.textContent = price || "";
   
-  buyBtn.onclick = () => {
-    buyNow(title, price, section);
-  };
-  
+  buyBtn.onclick = () => { buyNow(title, price, section); };
   modal.classList.add("active");
 }
 
 function closeMedia() {
   const modal = document.getElementById("media-modal");
   const mediaContainer = document.getElementById("media-modal-media");
-  
   modal.classList.remove("active");
   setTimeout(() => { mediaContainer.innerHTML = ""; }, 300);
 }
 
-// Info / Legal Modal Logic (For Footer Links)
+// ====== MODAL CONTROLS ======
 function openInfoModal(type) {
   const modal = document.getElementById("info-modal");
   const titleEl = document.getElementById("info-modal-title");
@@ -192,16 +190,37 @@ function openInfoModal(type) {
   } else if(type === 'faqs') {
     titleEl.textContent = "Frequently Asked Questions";
     contentEl.innerHTML = "<strong>How does delivery work?</strong><br><p style='margin-bottom: 10px;'>We use safe, climate-controlled pet transport directly to your door. A specialist will accompany your pet to ensure they are stress-free.</p><strong>Are the pets vaccinated?</strong><br><p style='margin-bottom: 10px;'>Yes, all pets are 100% vet-checked, fully vaccinated up to their age, and microchipped.</p><strong>Do you offer a health guarantee?</strong><br><p>Yes! We offer a comprehensive health guarantee against genetic defects. Details will be provided during purchase.</p>";
+  } else if(type === 'shipping') {
+    titleEl.textContent = "Transport & Logistics";
+    contentEl.innerHTML = "<strong>How do the pets travel?</strong><br><p style='margin-bottom: 10px;'>We utilize strict climate-controlled logistics for all international and domestic transport. Your companion travels in a premium, stress-free environment.</p><strong>What about paperwork?</strong><br><p>We handle all necessary customs documentation, health certificates, and travel clearance to ensure a seamless journey from our nest to your home.</p>";
   }
-
   modal.classList.add("active");
 }
+function closeInfoModal() { document.getElementById("info-modal").classList.remove("active"); }
 
-function closeInfoModal() {
-  document.getElementById("info-modal").classList.remove("active");
+function openContactModal() { document.getElementById("contact-modal").classList.add("active"); }
+function closeContactModal() { document.getElementById("contact-modal").classList.remove("active"); }
+
+function openTikTokModal() { document.getElementById("tiktok-modal").classList.add("active"); }
+function closeTikTokModal() { document.getElementById("tiktok-modal").classList.remove("active"); }
+
+function openDiscountModal() { document.getElementById("discount-modal").classList.add("active"); }
+function closeDiscountModal() { document.getElementById("discount-modal").classList.remove("active"); }
+
+// Popup Interval Timers
+function startPopups() {
+  // TikTok: Every 4 Minutes (240,000 ms)
+  setInterval(() => {
+    openTikTokModal();
+  }, 240000);
+
+  // Discount: Every 6 Minutes (360,000 ms)
+  setInterval(() => {
+    openDiscountModal();
+  }, 360000);
 }
 
-// Favorites Logic
+
 function toggleFav(id, name, priceText, section) {
   const index = favorites.findIndex(f => f.id === id);
   if (index > -1) {
@@ -217,18 +236,14 @@ function toggleFav(id, name, priceText, section) {
   renderCurrentView(); 
 }
 
-function isFavorite(id) {
-  return favorites.some(f => f.id === id);
-}
+function isFavorite(id) { return favorites.some(f => f.id === id); }
 
 function toggleFavorites() {
   document.getElementById("favorites-overlay")?.classList.toggle("active");
   document.getElementById("cart-overlay")?.classList.remove("active");
 }
 
-function goToFavSection(section) {
-  switchPage(section);
-}
+function goToFavSection(section) { switchPage(section); }
 
 function updateFavoritesUI() {
   const badge = document.getElementById("favorites-badge");
@@ -436,7 +451,6 @@ function checkout() {
   window.open(`https://wa.me/${whatsapp}?text=${encodeURIComponent(msg)}`, "_blank");
 }
 
-// Professional Testimonial Data
 const testimonials = [
   { text: "“The Pet Nest made finding our Golden Retriever so incredibly easy. He arrived perfectly healthy and extremely well-socialized. We are beyond thrilled.”", author: "- Sarah & Mark T." },
   { text: "“I was hesitant about buying a pet online, but their 100% health guarantee and constant communication put me at ease. Best decision we've made!”", author: "- Jessica R." },
@@ -468,7 +482,7 @@ function initTestimonials() {
     slides[currentSlide].classList.remove('active');
     currentSlide = (currentSlide + 1) % slides.length;
     slides[currentSlide].classList.add('active');
-  }, 5000);
+  }, 8000);
 }
 
 window.onscroll = function () {
@@ -478,7 +492,6 @@ window.onscroll = function () {
   else btn.classList.remove("visible");
 };
 
-// PREMIUM SKELETON LOADERS
 function showSpinners() {
   const skeletonCards = Array(8).fill(`
     <div class="skeleton-card">
@@ -508,7 +521,6 @@ async function init() {
   if (navigator.onLine) {
     showSpinners(); 
     
-    // Force the skeleton loaders to display for exactly 3 seconds so the premium animation is visible to the user
     await Promise.all([
       fetchPets(),
       new Promise(resolve => setTimeout(resolve, 3000)) 
@@ -521,6 +533,7 @@ async function init() {
   renderCurrentView();
   updateCartUI();
   updateFavoritesUI(); 
+  startPopups(); // Initialize Modals
 }
 
 init();
