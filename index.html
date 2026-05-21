@@ -14,37 +14,6 @@
 </head>
 <body>
 
-  <!-- EXACT MOBILE CHROME DINOSAUR SCREEN (Light Mode) -->
-  <div id="dino-screen" class="dino-screen" style="display: none;">
-    <div class="dino-container">
-      <svg class="dino-icon" viewBox="0 0 24 24" fill="#535353">
-        <path d="M20 0h-8v4H8V2H6v2H4v6h2v2h2v2h2v6H8v2h2v2h2v-4h2v2h2v-2h-2v-2h4v-2h2v-2h2V0h-4zm0 8h-2v2h-2V8h-2V6h2V4h2v4h2v-4h2v8h-2v-2zM3 22h14v2H3zM2 20h2v2H2zM19 22h3v2h-3z"/>
-      </svg>
-      
-      <h2>No internet</h2>
-      
-      <p class="dino-try">Try:</p>
-      <ul>
-        <li>Turning off airplane mode</li>
-        <li>Turning on mobile data or Wi-Fi</li>
-        <li>Checking the signal in your area</li>
-      </ul>
-      
-      <p class="dino-err">ERR_INTERNET_DISCONNECTED</p>
-      
-      <div class="dino-load-later">
-        <svg focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zM5 18v2h14v-2H5z" fill="#1a73e8"></path></svg>
-        <span>LOAD PAGE LATER</span>
-      </div>
-      
-      <div class="dino-chrome-box">
-        <span class="dino-box-text">Chrome will let you know when this page is ready. Cancel</span>
-        <svg class="dino-check" viewBox="0 0 24 24" fill="#1a73e8"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/></svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- MAIN APP WRAPPER -->
   <div id="app-wrapper" class="app-wrapper">
     <header>
       <a class="logo" onclick="switchPage('home')">
@@ -77,7 +46,6 @@
       </nav>
     </header>
 
-    <!-- HOME -->
     <main id="view-home" class="page-view active">
       <section class="hero">
         <div class="hero-content-box">
@@ -164,7 +132,6 @@
       </section>
     </main>
 
-    <!-- SALE -->
     <main id="view-sale" class="page-view">
       <div class="container">
         <div class="fancy-page-header">
@@ -193,7 +160,6 @@
       </div>
     </main>
 
-    <!-- ADOPTION -->
     <main id="view-adoption" class="page-view">
       <div class="container">
         <div class="fancy-page-header">
@@ -222,7 +188,6 @@
       </div>
     </main>
 
-    <!-- CART PANEL -->
     <div id="cart-overlay" class="cart-overlay">
       <div class="cart-panel">
         <div class="cart-header">
@@ -240,7 +205,6 @@
       </div>
     </div>
 
-    <!-- FAVORITES PANEL -->
     <div id="favorites-overlay" class="cart-overlay">
       <div class="cart-panel">
         <div class="cart-header">
@@ -274,7 +238,6 @@
       </div>
     </div>
 
-    <!-- PROFESSIONAL FOOTER -->
     <footer>
       <div class="footer-content">
         <div class="footer-brand">
@@ -286,8 +249,7 @@
           <a class="footer-btn" onclick="openInfoModal('terms')">Terms of Service</a>
           <a class="footer-btn" onclick="openInfoModal('faqs')">FAQs</a>
           <a class="footer-btn" onclick="openInfoModal('shipping')">Transport & Logistics</a>
-          <!-- ADDED CONTACT US BUTTON HERE -->
-          <a class="footer-btn" onclick="openContactModal()">Contact Us</a>
+          <button class="footer-btn contact-btn-fix" onclick="openContactModal()">Contact Us</button>
         </div>
       </div>
       <div class="footer-bottom">
@@ -295,7 +257,6 @@
       </div>
     </footer>
 
-    <!-- INFO / LEGAL MODAL (For Footer Links) -->
     <div id="info-modal" class="media-modal" onclick="closeInfoModal()">
       <div class="modal-card info-modal-card" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeInfoModal()">&times;</button>
@@ -306,7 +267,6 @@
       </div>
     </div>
 
-    <!-- UPGRADED MEDIA MODAL WITH ACTION BUTTONS -->
     <div id="media-modal" class="media-modal" onclick="closeMedia()">
       <div class="modal-card" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeMedia()">&times;</button>
@@ -322,9 +282,6 @@
       </div>
     </div>
 
-    <!-- ================= ADDED MODALS ================= -->
-
-    <!-- CONTACT US MODAL -->
     <div id="contact-modal" class="media-modal" onclick="closeContactModal()">
       <div class="modal-card info-modal-card" style="text-align:center; padding: 30px;" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeContactModal()">&times;</button>
@@ -336,7 +293,6 @@
       </div>
     </div>
 
-    <!-- TIKTOK 4-MINUTE MODAL -->
     <div id="tiktok-modal" class="media-modal" onclick="closeTikTokModal()">
       <div class="modal-card info-modal-card" style="text-align:center; padding: 35px 25px;" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeTikTokModal()">&times;</button>
@@ -349,7 +305,6 @@
       </div>
     </div>
 
-    <!-- DISCOUNT 6-MINUTE MODAL -->
     <div id="discount-modal" class="media-modal" onclick="closeDiscountModal()">
       <div class="modal-card info-modal-card" style="text-align:center; padding:0; background: linear-gradient(135deg, #1e3c5a, #2a527b); color: white; border: 2px solid #f4a261; border-radius: 16px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" onclick="event.stopPropagation()">
         <button class="close-modal" onclick="closeDiscountModal()" style="background: rgba(255,255,255,0.2);">&times;</button>
