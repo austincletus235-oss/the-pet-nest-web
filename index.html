@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>The Pet Nest | Premium Companions</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -224,16 +224,17 @@
 
     <div id="toast-container" class="toast-container"></div>
 
-    <div style="background: #fff; padding: 20px 5%; text-align: center; border-top: 1px solid #eee;">
-      <div style="max-width: 800px; margin: 0 auto; display: flex; justify-content: space-around; flex-wrap: wrap; gap: 15px;">
-        <div style="display: flex; align-items: center; gap: 8px; color: #555; font-size: 0.9rem; font-weight: 500;">
-          <span style="font-size: 1.4rem;">✈️</span> Global Logistics Verified
+    <div class="info-bar-container">
+      <div class="info-bar-scroller">
+        <div class="info-bar-content">
+          <div class="info-item"><span class="icon">✈️</span> Global Logistics Verified</div>
+          <div class="info-item"><span class="icon">🔒</span> Secure Transactions</div>
+          <div class="info-item"><span class="icon">❤️</span> Ethical Breeder Network</div>
         </div>
-        <div style="display: flex; align-items: center; gap: 8px; color: #555; font-size: 0.9rem; font-weight: 500;">
-          <span style="font-size: 1.4rem;">🔒</span> Secure Transactions
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; color: #555; font-size: 0.9rem; font-weight: 500;">
-          <span style="font-size: 1.4rem;">❤️</span> Ethical Breeder Network
+        <div class="info-bar-content">
+          <div class="info-item"><span class="icon">✈️</span> Global Logistics Verified</div>
+          <div class="info-item"><span class="icon">🔒</span> Secure Transactions</div>
+          <div class="info-item"><span class="icon">❤️</span> Ethical Breeder Network</div>
         </div>
       </div>
     </div>
@@ -249,7 +250,7 @@
           <a class="footer-btn" onclick="openInfoModal('terms')">Terms of Service</a>
           <a class="footer-btn" onclick="openInfoModal('faqs')">FAQs</a>
           <a class="footer-btn" onclick="openInfoModal('shipping')">Transport & Logistics</a>
-          <button class="footer-btn contact-btn-fix" onclick="openContactModal()">Contact Us</button>
+          <a class="footer-btn contact-btn-fix" onclick="openContactModal()">Contact Us</a>
         </div>
       </div>
       <div class="footer-bottom">
