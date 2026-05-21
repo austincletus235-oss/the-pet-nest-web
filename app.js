@@ -25,21 +25,6 @@ const PAGE_SIZE = 8;
 const visibleCounts = { sale: PAGE_SIZE, adoption: PAGE_SIZE };
 const selectedCategory = { sale: "all", adoption: "all" };
 
-function updateNetworkStatus() {
-  const dino = document.getElementById('dino-screen');
-  const app = document.getElementById('app-wrapper');
-  
-  if (navigator.onLine) {
-    dino.style.display = 'none';
-    app.style.display = 'flex';
-  } else {
-    app.style.display = 'none';
-    dino.style.display = 'flex';
-  }
-}
-window.addEventListener('online', () => { updateNetworkStatus(); init(); });
-window.addEventListener('offline', updateNetworkStatus);
-
 function showToast(message) {
   const container = document.getElementById('toast-container');
   if (!container) return;
@@ -124,14 +109,13 @@ function getSearchTerm() {
   return String(document.getElementById("globalSearch")?.value || "").trim().toLowerCase();
 }
 
-// ====== UPGRADED SEARCH SYSTEM (Name, Breed/Description, Category, Price) ======
 function applySearch(list, term) {
   if (!term) return [...list];
   return list.filter((p) => {
     const t = n(term);
     const nameMatch = n(p.name).includes(t);
     const catMatch = n(p.category).includes(t);
-    const descMatch = n(p.description).includes(t); // Broad search captures breeds written in desc
+    const descMatch = n(p.description).includes(t); 
     const priceStr = String(p.price || "").toLowerCase();
     const formattedPrice = formatPrice(p.price).toLowerCase();
     
@@ -207,8 +191,19 @@ function closeTikTokModal() { document.getElementById("tiktok-modal").classList.
 function openDiscountModal() { document.getElementById("discount-modal").classList.add("active"); }
 function closeDiscountModal() { document.getElementById("discount-modal").classList.remove("active"); }
 
-// Popup Interval Timers
+// ====== TIMED POPUPS ======
 function startPopups() {
+  // 1. Show Discount Modal immediately (1.5s delay so it looks smooth on entry)
+  setTimeout(() => {
+    openDiscountModal();
+  }, 1500);
+
+  // 2. Show TikTok Modal a few minutes later (2 minutes)
+  setTimeout(() => {
+    openTikTokModal();
+  }, 120000);
+
+  // 3. Keep the requested intervals running continuously in the background
   // TikTok: Every 4 Minutes (240,000 ms)
   setInterval(() => {
     openTikTokModal();
@@ -516,8 +511,6 @@ function showSpinners() {
 }
 
 async function init() {
-  updateNetworkStatus();
-  
   if (navigator.onLine) {
     showSpinners(); 
     
@@ -533,7 +526,7 @@ async function init() {
   renderCurrentView();
   updateCartUI();
   updateFavoritesUI(); 
-  startPopups(); // Initialize Modals
+  startPopups(); // Initialize Modals and Timers
 }
 
 init();
