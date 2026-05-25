@@ -15,28 +15,29 @@
 <body>
 
   <div id="app-wrapper" class="app-wrapper">
+    
     <header>
-      <a class="logo" onclick="switchPage('home')">
-        <img src="logo.png" class="logo-img" alt="The Pet Nest logo" onerror="this.style.display='none'" />
-        <span>The Pet Nest</span>
-      </a>
+      <div class="header-top-row">
+        <a class="logo" onclick="switchPage('home')">
+          <img src="logo.png" class="logo-img" alt="The Pet Nest logo" onerror="this.style.display='none'" />
+          <span>The Pet Nest</span>
+        </a>
 
-      <div class="header-controls">
-        <div class="search-bar">
-          <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" onkeypress="if(event.key === 'Enter') handleGlobalSearch()" />
-          <button onclick="handleGlobalSearch()" class="search-btn">🔍</button>
-        </div>
         <div class="header-icons-wrap">
           <div class="cart-icon" onclick="toggleFavorites()">
-            ❤️ <span class="text-label">Favorites</span>
+            ❤️ <span class="text-label" style="display:none;">Favorites</span>
             <span class="cart-count" id="favorites-badge">0</span>
           </div>
           <div class="cart-icon" onclick="toggleCart()">
-            🛒 <span class="text-label">Cart</span>
+            🛒 <span class="text-label" style="display:none;">Cart</span>
             <span class="cart-count" id="cart-badge">0</span>
           </div>
         </div>
-        <button class="hamburger" onclick="toggleMenu()">☰</button>
+      </div>
+
+      <div class="search-bar">
+        <input id="globalSearch" type="text" placeholder="Search pets..." oninput="handleGlobalSearch()" onkeypress="if(event.key === 'Enter') handleGlobalSearch()" />
+        <button onclick="handleGlobalSearch()" class="search-btn">🔍</button>
       </div>
 
       <nav class="nav-links" id="navMenu">
