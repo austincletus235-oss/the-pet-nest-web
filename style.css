@@ -17,9 +17,21 @@ body { background: var(--bg); color: var(--text); display: flex; flex-direction:
 
 .app-wrapper { display: flex; flex-direction: column; min-height: 100vh; width: 100%; }
 
+/* =========================================
+   WELCOME SPLASH ANIMATION
+========================================= */
+#welcome-splash { position: fixed; inset: 0; background: #fff; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: hideSplash 0.5s ease-in-out 2.5s forwards; }
+.splash-logo { width: 140px; height: 140px; object-fit: contain; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; background: #fff; }
+.splash-text { margin-top: 20px; font-size: clamp(1.4rem, 4vw, 2.2rem); color: var(--primary); font-weight: 700; opacity: 0; animation: fadeInUp 0.8s ease 0.5s forwards; text-align: center; padding: 0 20px; }
+
+@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+@keyframes fadeInUp { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes hideSplash { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; pointer-events: none; display: none; } }
+
+/* Header & Increased Logo Size */
 header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,.04); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
 .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
-.logo-img { height: 55px; width: 55px; border-radius: 50%; object-fit: contain; background: #fff; transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
+.logo-img { height: 80px; width: 80px; border-radius: 50%; object-fit: contain; background: #fff; transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 .header-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex-grow: 1; justify-content: flex-end; }
 .search-bar { display: flex; align-items: center; background: #f0f2f5; padding: 8px 14px; border-radius: 20px; width: 100%; max-width: 220px; }
 .search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.85rem; }
@@ -45,7 +57,7 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 
 @media (max-width: 500px) { 
   .logo span { font-size: 1.15rem; } 
-  .logo-img { height: 40px; width: 40px; } 
+  .logo-img { height: 60px; width: 60px; } 
   header { padding: 10px 4%; gap: 8px; } 
   .cart-icon .text-label { display: none; }
   .header-icons-wrap { gap: 8px; }
