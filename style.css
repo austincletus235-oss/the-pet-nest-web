@@ -18,22 +18,39 @@ body { background: var(--bg); color: var(--text); display: flex; flex-direction:
 .app-wrapper { display: flex; flex-direction: column; min-height: 100vh; width: 100%; }
 
 /* =========================================
-   WELCOME SPLASH ANIMATION
+   LIVELY WELCOME SPLASH ANIMATION
 ========================================= */
-#welcome-splash { position: fixed; inset: 0; background: #fff; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: hideSplash 0.5s ease-in-out 2.5s forwards; }
-.splash-logo { width: 140px; height: 140px; object-fit: contain; border-radius: 50%; box-shadow: 0 4px 15px rgba(0,0,0,0.1); animation: popIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards; background: #fff; }
-.splash-text { margin-top: 20px; font-size: clamp(1.4rem, 4vw, 2.2rem); color: var(--primary); font-weight: 700; opacity: 0; animation: fadeInUp 0.8s ease 0.5s forwards; text-align: center; padding: 0 20px; }
+#welcome-splash { position: fixed; inset: 0; background: #fff; z-index: 999999; display: flex; flex-direction: column; justify-content: center; align-items: center; animation: hideSplash 0.6s ease-in-out 3.2s forwards; }
+.splash-logo { width: 150px; height: 150px; object-fit: contain; border-radius: 50%; box-shadow: 0 8px 30px rgba(0,0,0,0.15); background: #fff; animation: springIn 1s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards, heartbeat 1.5s ease-in-out infinite 1s; }
+.splash-text { margin-top: 25px; font-size: clamp(1.4rem, 4vw, 2.2rem); color: var(--primary); font-weight: 700; opacity: 0; text-align: center; padding: 0 20px; animation: dropIn 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275) 0.4s forwards; }
 
-@keyframes popIn { 0% { transform: scale(0.5); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
-@keyframes fadeInUp { 0% { transform: translateY(20px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
+@keyframes springIn { 0% { transform: scale(0) rotate(-20deg); opacity: 0; } 100% { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes heartbeat { 0%, 100% { transform: scale(1); } 15% { transform: scale(1.08); } 30% { transform: scale(1); } 45% { transform: scale(1.08); } 60% { transform: scale(1); } }
+@keyframes dropIn { 0% { transform: translateY(-30px); opacity: 0; } 100% { transform: translateY(0); opacity: 1; } }
 @keyframes hideSplash { 0% { opacity: 1; visibility: visible; } 100% { opacity: 0; visibility: hidden; pointer-events: none; display: none; } }
 
-/* Header & Increased Logo Size */
-header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 12px 5%; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 15px rgba(0,0,0,.04); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 10px; }
+/* =========================================
+   HEADER (MARKER COLOUR) 
+========================================= */
+header { 
+  background: linear-gradient(135deg, #e3f2fd 0%, #ffffff 100%); /* Beautiful soft blue gradient marker color */
+  backdrop-filter: blur(10px); 
+  -webkit-backdrop-filter: blur(10px); 
+  padding: 12px 5%; 
+  display: flex; 
+  justify-content: space-between; 
+  align-items: center; 
+  box-shadow: 0 2px 15px rgba(0,0,0,.06); 
+  position: sticky; 
+  top: 0; 
+  z-index: 100; 
+  flex-wrap: wrap; 
+  gap: 10px; 
+}
 .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary); display: flex; align-items: center; gap: 10px; text-decoration: none; cursor: pointer; }
 .logo-img { height: 80px; width: 80px; border-radius: 50%; object-fit: contain; background: #fff; transition: 0.3s; box-shadow: 0 2px 6px rgba(0,0,0,0.08); }
 .header-controls { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; flex-grow: 1; justify-content: flex-end; }
-.search-bar { display: flex; align-items: center; background: #f0f2f5; padding: 8px 14px; border-radius: 20px; width: 100%; max-width: 220px; }
+.search-bar { display: flex; align-items: center; background: rgba(255,255,255,0.7); border: 1px solid rgba(0,0,0,0.05); padding: 8px 14px; border-radius: 20px; width: 100%; max-width: 220px; }
 .search-bar input { border: none; background: transparent; outline: none; width: 100%; font-size: 0.85rem; }
 .search-btn { background: none; border: none; cursor: pointer; font-size: 0.9rem; padding-left: 6px; }
 .hamburger { display: none; background: none; border: none; font-size: 1.6rem; color: var(--primary); cursor: pointer; }
@@ -43,7 +60,7 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 
 .header-icons-wrap { display: flex; gap: 12px; align-items: center; }
 .cart-icon { font-size: 1.05rem; cursor: pointer; position: relative; display: flex; align-items: center; gap: 6px; font-weight: 600; padding: 6px 10px; border-radius: 8px; transition: 0.2s; }
-.cart-icon:hover { background: #f0f2f5; }
+.cart-icon:hover { background: rgba(0,0,0,0.04); }
 .cart-count { position: absolute; top: -2px; left: 20px; background: var(--accent); color: #fff; font-size: 0.65rem; font-weight: 700; padding: 2px 6px; border-radius: 50%; border: 2px solid #fff; }
 
 @media (max-width: 850px) {
@@ -101,7 +118,6 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 .promo-card.red{ background:linear-gradient(45deg,#ff0844 0%,#ffb199 100%);}
 .promo-card.orange{ background:linear-gradient(45deg,#f6d365 0%,#fda085 100%);}
 
-/* COMPACT GRID FOR MOBILE VIEW AS REQUESTED */
 @media (max-width: 600px) {
   .promo-container { grid-template-columns: 1fr 1fr; }
   .promo-card:last-child { grid-column: span 2; }
@@ -181,7 +197,6 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 .trust-card p { font-size: 0.75rem; color: #555; line-height: 1.5; }
 
 @media (max-width: 600px) {
-  /* Crisp 2 column layout for Mobile (Trust Section) */
   .trust-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .trust-card:last-child { grid-column: span 2; }
 }
@@ -202,7 +217,6 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 .beautiful-pets-grid img:hover { transform: scale(1.03); }
 
 @media (max-width: 600px) {
-  /* Crisp 2 column layout for Mobile (Beautiful Pets) */
   .beautiful-pets-grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
   .beautiful-pets-grid img { height: 150px; }
 }
@@ -268,10 +282,7 @@ header { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(10px); -we
 .info-bar-content { display: flex; justify-content: space-around; min-width: 100%; gap: 40px; padding-right: 40px; }
 .info-item { display: inline-flex; align-items: center; gap: 8px; color: #555; font-size: 0.9rem; font-weight: 500; }
 .info-item .icon { font-size: 1.4rem; }
-@keyframes scrollInfo {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); } 
-}
+@keyframes scrollInfo { 0% { transform: translateX(0); } 100% { transform: translateX(-50%); } }
 .info-bar-container:hover .info-bar-scroller { animation-play-state: paused; }
 
 /* =========================================
@@ -288,7 +299,6 @@ footer { background:var(--primary); color:#fff; padding: 40px 5% 20px; margin-to
 .footer-bottom { text-align: center; opacity: 0.6; font-size: 0.8rem; }
 
 @media (max-width: 600px) {
-  /* Added huge bottom padding so WhatsApp button NEVER blocks the "Contact Us" text */
   footer { padding-bottom: 90px; } 
   .footer-content { flex-direction: column; text-align: center; align-items: center; }
   .footer-links { justify-content: center; gap: 15px; }
