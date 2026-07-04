@@ -1,3 +1,15 @@
+// ====== FORCE UNREGISTER OLD OFFLINE SERVICE WORKER ======
+// This ensures the browser completely forgets the old offline setup
+// and naturally defaults to the native Chrome dinosaur page.
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.getRegistrations().then(function(registrations) {
+    for(let registration of registrations) {
+      registration.unregister();
+    }
+  });
+}
+// =========================================================
+
 const SUPABASE_URL = "https://mbpdimmuuzrxgsraofew.supabase.co";
 const SUPABASE_ANON_KEY =
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1icGRpbW11dXpyeGdzcmFvZmV3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0MDYwNjAsImV4cCI6MjA5MTk4MjA2MH0.g54oYMrrChSGr_fRpMwFIYp5LAQcV1hzIJqvRXpjj6E";
@@ -66,8 +78,6 @@ function switchPage(page) {
 }
 
 async function fetchPets() {
-  if (!navigator.onLine) return false;
-
   const { data, error } = await supabaseClient
     .from("pets")
     .select("id,name,price,category,section,status,media_url,description,created_at")
@@ -501,16 +511,14 @@ function showSpinners() {
 }
 
 async function init() {
-  if (navigator.onLine) {
-    showSpinners(); 
-    
-    await Promise.all([
-      fetchPets(),
-      new Promise(resolve => setTimeout(resolve, 3000)) 
-    ]);
-    
-    setupRealtimeSubscription(); 
-  }
+  showSpinners(); 
+  
+  await Promise.all([
+    fetchPets(),
+    new Promise(resolve => setTimeout(resolve, 3000)) 
+  ]);
+  
+  setupRealtimeSubscription(); 
   
   initTestimonials();
   renderCurrentView();
