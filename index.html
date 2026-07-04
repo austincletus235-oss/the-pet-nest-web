@@ -14,6 +14,12 @@
 </head>
 <body>
 
+  <!-- Welcome Splash Screen -->
+  <div id="welcome-splash">
+    <img src="logo.png" class="splash-logo" alt="The Pet Nest Logo" onerror="this.style.display='none'" />
+    <h1 class="splash-text">Welcome to the pet nest</h1>
+  </div>
+
   <div id="app-wrapper" class="app-wrapper">
     <header>
       <a class="logo" onclick="switchPage('home')">
@@ -497,27 +503,17 @@
       
       function enforceNetworkStatus() {
         if (!navigator.onLine) {
-          // Disable scrolling on the main website body
           document.body.style.overflow = 'hidden'; 
-          // Force the screen to show
           offlineOverlay.style.display = 'block';
         } else {
-          // Re-enable scrolling
           document.body.style.overflow = '';
-          // Hide the screen
           offlineOverlay.style.display = 'none';
         }
       }
 
-      // 1. Listen for browser network events
       window.addEventListener('online', enforceNetworkStatus);
       window.addEventListener('offline', enforceNetworkStatus);
-
-      // 2. BRUTE FORCE: Check every 0.5 seconds. 
-      // If the network drops, it WILL show up instantly.
       setInterval(enforceNetworkStatus, 500);
-
-      // 3. Initial check
       enforceNetworkStatus();
     })();
   </script>
