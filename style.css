@@ -31,18 +31,9 @@ body { background: var(--bg); color: var(--text); display: flex; flex-direction:
   margin-top: 25px;
   padding: 0 20px;
   text-transform: capitalize; 
-  background: linear-gradient(90deg, #1e3c5a, #f4a261, #1e3c5a);
-  background-size: 200% auto;
-  color: transparent;
-  -webkit-background-clip: text;
-  background-clip: text;
-  animation: shine 3s linear infinite, slideUpFade 1.2s ease-out forwards;
-}
-
-@keyframes shine {
-  to {
-    background-position: 200% center;
-  }
+  color: var(--primary); 
+  opacity: 0; 
+  animation: slideUpFade 1.2s ease-out forwards 0.5s; 
 }
 
 @keyframes slideUpFade {
@@ -289,21 +280,18 @@ header {
 .modal-media-container {
   width: 100%;
   background-color: #ffffff !important; 
-  overflow: hidden;
   display: flex;
   justify-content: center;
   align-items: center;
-  flex-shrink: 0;
   border-bottom: 1px solid #eee;
 }
 
 .modal-media-container img,
 .modal-media-container video {
   width: 100% !important;
-  height: 100% !important;
-  max-height: 40svh;
-  object-fit: cover !important; 
-  object-position: center !important; 
+  height: auto !important;
+  max-height: 60vh !important;
+  object-fit: contain !important; 
   display: block;
 }
 
